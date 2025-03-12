@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="third_party">
+      <UniqueIdentifier>{0FB18DF1-7B66-06E7-045B-00BE700FFDEA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\imgui">
+      <UniqueIdentifier>{B90D4423-2524-42B9-6E9B-CDDADAF01241}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\third_party\imgui\imconfig.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui_impl_glfw.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui_impl_vulkan.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui_internal.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imstb_rectpack.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imstb_textedit.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imstb_truetype.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Bloom.hpp" />
+    <ClInclude Include="Buffer.hpp" />
+    <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Context.hpp" />
+    <ClInclude Include="DefCompositePass.hpp" />
+    <ClInclude Include="DefLighting.hpp" />
+    <ClInclude Include="DepthPrepass.hpp" />
+    <ClInclude Include="Engine.hpp" />
+    <ClInclude Include="ForwardPass.hpp" />
+    <ClInclude Include="GBuffer.hpp" />
+    <ClInclude Include="ImGuiRenderer.hpp" />
+    <ClInclude Include="Image.hpp" />
+    <ClInclude Include="Light.hpp" />
+    <ClInclude Include="MeshDensity.hpp" />
+    <ClInclude Include="Pipeline.hpp" />
+    <ClInclude Include="PresentPass.hpp" />
+    <ClInclude Include="RenderPass.hpp" />
+    <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="Scene.hpp" />
+    <ClInclude Include="ShadowMap.hpp" />
+    <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="baked_model.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\third_party\imgui\imgui.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_demo.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_draw.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_impl_glfw.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_impl_vulkan.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_tables.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_widgets.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Bloom.cpp" />
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="DefCompositePass.cpp" />
+    <ClCompile Include="DefLighting.cpp" />
+    <ClCompile Include="DepthPrepass.cpp" />
+    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="ForwardPass.cpp" />
+    <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="ImGuiRenderer.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="MeshDensity.cpp" />
+    <ClCompile Include="PresentPass.cpp" />
+    <ClCompile Include="RenderPass.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="SSR.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="baked_model.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+</Project>

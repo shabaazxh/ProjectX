@@ -81,11 +81,11 @@ project "ProjectX"
 	}
 
 	kind "ConsoleApp"
-	location "a12"
+	location "ProjectX"
 
 	files( sources )
 
-	dependson "a12-shaders"
+	dependson "ProjectX-shaders"
 
 	links "labutils"
 	links "x-volk"
@@ -96,7 +96,7 @@ project "ProjectX"
 
 	dependson "x-glm"
 
-project "a12-shaders"
+project "ProjectX-shaders"
 	local shaders = { 
 		"ProjectX/shaders/*.vert",
 		"ProjectX/shaders/*.frag",
@@ -111,7 +111,7 @@ project "a12-shaders"
 
 	files( shaders )
 
-	handle_glsl_files( glslcOptions, "assets/a12/shaders", {} )
+	handle_glsl_files( glslcOptions, "assets/shaders", {} )
 
 project "a12-bake"
 	local sources = { 
