@@ -1,0 +1,26 @@
+#version 450
+
+layout(location = 0) in vec4 WorldPos;
+layout(location = 1) in vec2 uv;
+layout(location = 2) in vec4 WorldNormal;
+
+layout(location = 0) out vec4 fragColor;
+
+layout(early_fragment_tests) in;
+
+layout(set = 0, binding = 0) uniform SceneUniform
+{
+	mat4 model;
+	mat4 view;
+	mat4 projection;
+    vec4 cameraPosition;
+	vec2 viewportSize;
+	float fov;
+	float nearPlane;
+	float farPlane;
+} ubo;
+
+void main()
+{
+	fragColor = vec4(0.1, 0.01, 0.01, 1.0);
+}
