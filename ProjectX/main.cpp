@@ -21,21 +21,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "../labutils/to_string.hpp"
-#include "../labutils/vulkan_window.hpp"
-
-#include "../labutils/angle.hpp"
-using namespace labutils::literals;
-
-#include "../labutils/error.hpp"
-#include "../labutils/vkutil.hpp"
-#include "../labutils/vkimage.hpp"
-#include "../labutils/vkobject.hpp"
-#include "../labutils/vkbuffer.hpp"
-#include "../labutils/allocator.hpp" 
-namespace lut = labutils;
-
 #include "baked_model.hpp"
 
 #include <iostream>
@@ -78,4 +63,4 @@ catch( std::exception const& eErr )
 }
 
 
-//EOF vim:syntax=cpp:foldmethod=marker:ts=4:noexpandtab: 
+//EOF vim:syntax=cpp:foldmethod=marker:ts=4:noexpandtab:
