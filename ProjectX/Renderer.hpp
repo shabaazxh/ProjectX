@@ -15,6 +15,7 @@
 #include "DefCompositePass.hpp"
 #include "ShadowMap.hpp"
 #include "Bloom.hpp"
+#include "ImGuiRenderer.hpp"
 
 //Deferred
 namespace vk
@@ -35,7 +36,7 @@ namespace vk
 		static void glfwHandleKeyboard(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 		static void glfwCallbackMotion(GLFWwindow* window, double x, double y);
-		
+
 	private:
 		void CreateResources();
 		void CreateFences();

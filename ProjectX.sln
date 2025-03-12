@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x-glfw", "third_party\x-glf
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x-glm", "third_party\x-glm.vcxproj", "{2AEE9410-9602-BDC1-5F84-6021CB57B9F2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x-imgui", "third_party\x-imgui.vcxproj", "{05D4AD89-71B3-2C25-7ACB-B7FBE6299386}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x-rapidobj", "third_party\x-rapidobj.vcxproj", "{B5238A01-A1DB-CB4E-0AE3-A4AAF6B9663F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x-stb", "third_party\x-stb.vcxproj", "{33229510-9F36-BDC1-68B8-6021D48BB9F2}"
@@ -65,6 +67,10 @@ Global
 		{2AEE9410-9602-BDC1-5F84-6021CB57B9F2}.debug|x64.Build.0 = debug|x64
 		{2AEE9410-9602-BDC1-5F84-6021CB57B9F2}.release|x64.ActiveCfg = release|x64
 		{2AEE9410-9602-BDC1-5F84-6021CB57B9F2}.release|x64.Build.0 = release|x64
+		{05D4AD89-71B3-2C25-7ACB-B7FBE6299386}.debug|x64.ActiveCfg = debug|x64
+		{05D4AD89-71B3-2C25-7ACB-B7FBE6299386}.debug|x64.Build.0 = debug|x64
+		{05D4AD89-71B3-2C25-7ACB-B7FBE6299386}.release|x64.ActiveCfg = release|x64
+		{05D4AD89-71B3-2C25-7ACB-B7FBE6299386}.release|x64.Build.0 = release|x64
 		{B5238A01-A1DB-CB4E-0AE3-A4AAF6B9663F}.debug|x64.ActiveCfg = debug|x64
 		{B5238A01-A1DB-CB4E-0AE3-A4AAF6B9663F}.debug|x64.Build.0 = debug|x64
 		{B5238A01-A1DB-CB4E-0AE3-A4AAF6B9663F}.release|x64.ActiveCfg = release|x64

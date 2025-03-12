@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ProjectX">
+      <UniqueIdentifier>{34B858A2-2085-B3AD-499E-A15535CAE83B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party">
+      <UniqueIdentifier>{0FB18DF1-7B66-06E7-045B-00BE700FFDEA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\imgui">
+      <UniqueIdentifier>{B90D4423-2524-42B9-6E9B-CDDADAF01241}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ProjectX\Bloom.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Buffer.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Camera.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Context.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\DefCompositePass.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\DefLighting.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\DepthPrepass.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Engine.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\ForwardPass.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\GBuffer.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\ImGuiRenderer.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Image.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Light.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\MeshDensity.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Pipeline.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\PresentPass.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\RenderPass.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Renderer.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Scene.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\ShadowMap.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\Utils.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ProjectX\baked_model.hpp">
+      <Filter>ProjectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imconfig.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui_impl_glfw.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui_impl_vulkan.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imgui_internal.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imstb_rectpack.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imstb_textedit.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\imgui\imstb_truetype.h">
+      <Filter>third_party\imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ProjectX\Bloom.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Buffer.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Camera.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Context.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\DefCompositePass.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\DefLighting.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\DepthPrepass.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Engine.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\ForwardPass.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\GBuffer.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\ImGuiRenderer.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Image.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\MeshDensity.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\PresentPass.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\RenderPass.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Renderer.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\SSR.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Scene.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\ShadowMap.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\Utils.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\baked_model.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProjectX\main.cpp">
+      <Filter>ProjectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_demo.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_draw.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_impl_glfw.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_impl_vulkan.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_tables.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\imgui\imgui_widgets.cpp">
+      <Filter>third_party\imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

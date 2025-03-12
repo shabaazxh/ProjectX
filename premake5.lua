@@ -75,7 +75,9 @@ project "ProjectX"
 	local sources = { 
 		"ProjectX/**.cpp",
 		"ProjectX/**.hpp",
-		"ProjectX/**.hxx"
+		"ProjectX/**.hxx",
+		"third_party/imgui/*.cpp",
+		"third_party/imgui/*.h"
 	}
 
 	kind "ConsoleApp"
@@ -90,6 +92,7 @@ project "ProjectX"
 	links "x-stb"
 	links "x-glfw"
 	links "x-vma"
+	links "x-imgui"
 
 	dependson "x-glm"
 

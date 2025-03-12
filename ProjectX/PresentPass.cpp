@@ -6,13 +6,14 @@
 #include "Utils.hpp"
 #include "Buffer.hpp"
 #include "RenderPass.hpp"
+#include "ImGuiRenderer.hpp"
 
 vk::PresentPass::PresentPass(Context& context, Image& renderedScene, Image& deferredRender, Image& meshDensity) :
-	context{ context }, 
-	renderedScene{ renderedScene }, 
-	deferredRender{ deferredRender }, 
+	context{ context },
+	renderedScene{ renderedScene },
+	deferredRender{ deferredRender },
 	meshDensity{meshDensity},
-	m_pipeline { VK_NULL_HANDLE}, 
+	m_pipeline { VK_NULL_HANDLE},
 	m_pipelineLayout{ VK_NULL_HANDLE },
 	m_renderType {renderType}
 {
@@ -118,6 +119,8 @@ void vk::PresentPass::Execute(VkCommandBuffer cmd, uint32_t imageIndex)
 	// Draw large triangle here
 	vkCmdDraw(cmd, 3, 1, 0, 0);
 
+	ImGuiRenderer::Render(cmd, context, imageIndex);
+
 	vkCmdEndRenderPass(cmd);
 
 #ifdef _DEBUG
@@ -128,7 +131,7 @@ void vk::PresentPass::Execute(VkCommandBuffer cmd, uint32_t imageIndex)
 void vk::PresentPass::CreatePipeline()
 {
 
-	// Create the pipeline 
+	// Create the pipeline
 	auto pipelineResult = vk::PipelineBuilder(context.device, PipelineType::GRAPHICS, VertexBinding::NONE, 0)
 		.AddShader("../Engine/assets/a12/shaders/fs_tri.vert.spv", ShaderType::VERTEX)
 		.AddShader("../Engine/assets/a12/shaders/present_pass.frag.spv", ShaderType::FRAGMENT)

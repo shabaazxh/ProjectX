@@ -34,7 +34,7 @@ vk::Renderer::Renderer(Context& context) : context{context}
 	// Define Light sources
 	Light directionalLight;
 	directionalLight.Type = LightType::Directional;
-	directionalLight.position = glm::vec4(-0.2972, 5, 45.0f, 1.0f); // -0.2972
+	directionalLight.position = glm::vec4(0.0f, 1.0f, 0.0, 1.0f); // -0.2972
 	directionalLight.colour   = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 
@@ -92,12 +92,16 @@ vk::Renderer::Renderer(Context& context) : context{context}
 	m_Bloom		   = std::make_unique<Bloom>(context, m_DefLighting->GetBrightnessRenderTarget());
 	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget());
 	m_PresentPass  = std::make_unique<PresentPass>(context, m_ForwardPass->GetRenderTarget(), m_DefComposite->GetRenderTarget(), m_MeshDensity->GetRenderTarget());
+
+	ImGuiRenderer::Initialize(context);
+	ImGuiRenderer::AddTexture(clampToEdgeSamplerAniso, m_ShadowMap->GetRenderTarget().imageView, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL);
 }
 
 void vk::Renderer::Destroy()
 {
 	vkDeviceWaitIdle(context.device);
 
+	ImGuiRenderer::Shutdown(context);
 	m_DepthPrepass.reset();
 	m_MeshDensity.reset();
 	m_ForwardPass.reset();
@@ -347,6 +351,7 @@ void vk::Renderer::Update(double deltaTime)
 	m_scene->Update(context.window);
 
 	// Update passes
+	ImGuiRenderer::Update(m_scene, m_camera);
 	m_ShadowMap->Update();
 	m_ForwardPass->Update();
 	m_DefLighting->Update();

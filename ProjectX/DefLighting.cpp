@@ -8,20 +8,20 @@
 #include "Camera.hpp"
 
 vk::DefLighting::DefLighting(Context& context, std::shared_ptr<Camera>& camera, GBuffer::GBufferMRT& GBufferMRT, Image& shadowMap, std::shared_ptr<Scene> scene) :
-	context{ context }, 
-	m_Pipeline{ VK_NULL_HANDLE }, 
-	m_PipelineLayout{ VK_NULL_HANDLE }, 
-	m_descriptorSetLayout{ VK_NULL_HANDLE }, 
-	m_renderPass{ VK_NULL_HANDLE }, 
-	m_framebuffer{ VK_NULL_HANDLE }, 
-	m_width{ 0 }, 
-	m_height{ 0 }, 
+	context{ context },
+	m_Pipeline{ VK_NULL_HANDLE },
+	m_PipelineLayout{ VK_NULL_HANDLE },
+	m_descriptorSetLayout{ VK_NULL_HANDLE },
+	m_renderPass{ VK_NULL_HANDLE },
+	m_framebuffer{ VK_NULL_HANDLE },
+	m_width{ 0 },
+	m_height{ 0 },
 	GBufferMRT{ GBufferMRT },
 	m_shadowMap{shadowMap},
 	scene{scene},
 	camera { camera }
 {
-	
+
 	m_width = context.extent.width;
 	m_height = context.extent.height;
 
@@ -186,7 +186,7 @@ void vk::DefLighting::Execute(VkCommandBuffer cmd)
 
 	VkRenderPassBeginInfo rpBegin{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
 	rpBegin.renderPass = m_renderPass;
-	rpBegin.framebuffer = m_framebuffer; 
+	rpBegin.framebuffer = m_framebuffer;
 	rpBegin.renderArea.extent = { m_width, m_height };
 
 	VkClearValue clearValues[2];
@@ -232,7 +232,7 @@ void vk::DefLighting::Update()
 
 void vk::DefLighting::CreatePipeline()
 {
-	// Create the pipeline 
+	// Create the pipeline
 	auto pipelineResult = vk::PipelineBuilder(context.device, PipelineType::GRAPHICS, VertexBinding::NONE, 0)
 		.AddShader("../Engine/assets/a12/shaders/fs_tri.vert.spv", ShaderType::VERTEX)
 		.AddShader("../Engine/assets/a12/shaders/defLighting.frag.spv", ShaderType::FRAGMENT) //TODO: THIS IS RUNNING TEST SHADER AND NOT ACTUAL DEFLIGHTING SHADER
@@ -260,11 +260,11 @@ void vk::DefLighting::CreateRenderPass()
 		.AddAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_SAMPLE_COUNT_1_BIT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 		.AddColorAttachmentRef(0, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
 		.AddColorAttachmentRef(0, 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
-		// External -> 0 : Color 
+		// External -> 0 : Color
 		//.AddDependency(VK_SUBPASS_EXTERNAL, 0, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_DEPENDENCY_BY_REGION_BIT)
 		.AddDependency(VK_SUBPASS_EXTERNAL, 0,  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_DEPENDENCY_BY_REGION_BIT)
 
-		// 0 -> External : Color : Wait for color writing to finish on the attachment before the fragment shader tries to read from it 
+		// 0 -> External : Color : Wait for color writing to finish on the attachment before the fragment shader tries to read from it
 		.AddDependency(0, VK_SUBPASS_EXTERNAL, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_SHADER_READ_BIT, VK_DEPENDENCY_BY_REGION_BIT)
 		.Build();
 
@@ -324,7 +324,7 @@ void vk::DefLighting::BuildDescriptors()
 	for (size_t i = 0; i < (size_t)MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		VkDescriptorBufferInfo bufferInfo{};
-		bufferInfo.buffer = scene->GetLightsUBO()[i].buffer; // m_LightUBO[i].buffer; 
+		bufferInfo.buffer = scene->GetLightsUBO()[i].buffer; // m_LightUBO[i].buffer;
 		bufferInfo.offset = 0;
 		bufferInfo.range = sizeof(LightBuffer);
 		UpdateDescriptorSet(context, 1, bufferInfo, m_descriptorSets[i], VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);

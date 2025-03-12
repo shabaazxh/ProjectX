@@ -233,6 +233,7 @@ void main()
 			LightColour = lightData.lights[i].LightColour.xyz * att;
 		}
 		else {
+			lightDir = normalize(-lightData.lights[i].LightPosition.xyz);
 			LightColour = lightData.lights[i].LightColour.rgb;
 		}
 
