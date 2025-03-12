@@ -68,7 +68,7 @@ vk::Renderer::Renderer(Context& context) : context{context}
 
 	// Define and Add to scene
 	m_scene = std::make_shared<Scene>(context);
-	m_scene->AddModel(std::make_unique<BakedModel>(load_baked_model("assets/a12/suntemple.comp5892mesh_new_packed")));
+	m_scene->AddModel(std::make_unique<BakedModel>(load_baked_model("assets/suntemple.mesh"))); //comp5892mesh_new_packed
 	m_scene->AddLightSource(directionalLight);
 
 	for (const auto& position : spotLightPositions)

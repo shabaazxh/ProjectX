@@ -131,9 +131,9 @@ void vk::MeshDensity::CreatePipeline()
 	};
 
 	auto meshDensityPipeline = vk::PipelineBuilder(context.device, PipelineType::GRAPHICS, VertexBinding::BIND, 0)
-		.AddShader("../Engine/assets/a12/shaders/mesh_density.vert.spv", ShaderType::VERTEX)
-		.AddShader("../Engine/assets/a12/shaders/mesh_density.geom.spv", ShaderType::GEOM)
-		.AddShader("../Engine/assets/a12/shaders/mesh_density.frag.spv", ShaderType::FRAGMENT)
+		.AddShader("../Engine/assets/shaders/mesh_density.vert.spv", ShaderType::VERTEX)
+		.AddShader("../Engine/assets/shaders/mesh_density.geom.spv", ShaderType::GEOM)
+		.AddShader("../Engine/assets/shaders/mesh_density.frag.spv", ShaderType::FRAGMENT)
 		.SetInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.SetDynamicState({ {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR} })
 		.SetRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE)

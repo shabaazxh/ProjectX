@@ -130,7 +130,7 @@ int main() try
 	 */
 #	endif
 	process_model_(
-		"assets/a12/suntemple.comp5892mesh",
+		"assets/suntemple.comp5892mesh",
 		"assets-src/a12/suntemple.obj-zstd"
 	);
 

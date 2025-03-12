@@ -126,7 +126,7 @@ void vk::DepthPrepass::CreatePipeline()
 	};
 
 	auto pipelineResult = vk::PipelineBuilder(context.device, PipelineType::GRAPHICS, VertexBinding::BIND, 0)
-		.AddShader("../Engine/assets/a12/shaders/default.vert.spv", ShaderType::VERTEX)
+		.AddShader("../Engine/assets/shaders/default.vert.spv", ShaderType::VERTEX)
 		.SetInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.SetDynamicState({ {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR} })
 		.SetRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE)
