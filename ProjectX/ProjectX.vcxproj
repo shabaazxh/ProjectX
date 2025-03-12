@@ -158,9 +158,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\labutils\labutils.vcxproj">
-      <Project>{A5476A3F-9114-C54A-BA2D-B3F2A659FAD8}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\third_party\x-volk.vcxproj">
       <Project>{26FA3A23-129C-65F9-FB56-794DE797EC49}</Project>
     </ProjectReference>

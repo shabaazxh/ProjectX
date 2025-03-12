@@ -87,7 +87,6 @@ project "ProjectX"
 
 	dependson "ProjectX-shaders"
 
-	links "labutils"
 	links "x-volk"
 	links "x-stb"
 	links "x-glfw"
@@ -112,39 +111,6 @@ project "ProjectX-shaders"
 	files( shaders )
 
 	handle_glsl_files( glslcOptions, "assets/shaders", {} )
-
-project "a12-bake"
-	local sources = { 
-		"a12-bake/**.cpp",
-		"a12-bake/**.hpp",
-		"a12-bake/**.hxx"
-	}
-
-	kind "ConsoleApp"
-	location "a12-bake"
-
-	files( sources )
-
-	links "labutils" -- for lut::Error
-	links "x-tgen"
-	links "x-zstd"
-
-	dependson "x-glm" 
-	dependson "x-rapidobj"
-
-project "labutils"
-	local sources = { 
-		"labutils/**.cpp",
-		"labutils/**.hpp",
-		"labutils/**.hxx",
-		"labutils/imgui/**.cpp",
-		"labutils/imgui/**.hxx"
-	}
-
-	kind "StaticLib"
-	location "labutils"
-
-	files( sources )
 
 project()
 

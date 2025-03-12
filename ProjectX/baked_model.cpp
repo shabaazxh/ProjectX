@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <format>
 
 #include "../labutils/error.hpp"
 namespace lut = labutils;
@@ -23,9 +24,9 @@ namespace
 BakedModel load_baked_model( char const* aModelPath )
 {
 	FILE* fin = std::fopen( aModelPath, "rb" );
-	if( !fin )
-		throw lut::Error( "load_baked_model(): unable to open '%s' for reading", aModelPath );
-
+	if (!fin) {
+		throw std::runtime_error(std::format("load_baked_model(): unable to open '{}' for reading", aModelPath));
+	}
 	try
 	{
 		auto ret = load_baked_model_( fin, aModelPath );
@@ -46,7 +47,8 @@ namespace
 		auto ret = std::fread( aBuffer, 1, aBytes, aFin );
 
 		if( aBytes != ret )
-			throw lut::Error( "checked_read_(): expected %zu bytes, got %zu", aBytes, ret );
+			throw std::runtime_error(std::format("checked_read_(): expected {} bytes, got {}", aBytes, ret));
+
 	}
 
 	std::uint32_t read_uint32_( FILE* aFin )
@@ -60,7 +62,8 @@ namespace
 		auto const length = read_uint32_( aFin );
 
 		if( length >= kMaxString )
-			throw lut::Error( "read_string_(): unexpectedly long string (%u bytes)", length );
+			throw std::runtime_error(std::format("read_string_(): unexpectedly long string (%u bytes)", length));
+
 
 		std::string ret;
 		ret.resize( length );
@@ -87,13 +90,14 @@ namespace
 		checked_read_( aFin, 16, magic );
 
 		if( 0 != std::memcmp( magic, kFileMagic, 16 ) )
-			throw lut::Error( "load_baked_model_(): %s: invalid file signature!", aInputName );
+			throw std::runtime_error(std::format("load_baked_model_(): %s: invalid file signature!", aInputName));
+
 
 		char variant[16];
 		checked_read_( aFin, 16, variant );
 
 		if( 0 != std::memcmp( variant, kFileVariant, 16 ) )
-			throw lut::Error( "load_baked_model_(): %s: file variant is '%s', expected '%s'", aInputName, variant, kFileVariant );
+			throw std::runtime_error(std::format("load_baked_model_(): %s: file variant is '%s', expected '%s'", aInputName, variant, kFileVariant));
 
 		// Read texture info
 		auto const textureCount = read_uint32_( aFin );
