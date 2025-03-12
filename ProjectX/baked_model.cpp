@@ -6,9 +6,6 @@
 #include <cstring>
 #include <format>
 
-#include "../labutils/error.hpp"
-namespace lut = labutils;
-
 namespace
 {
 	// See cw2-bake/main.cpp for more info
