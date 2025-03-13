@@ -123,6 +123,16 @@ void vk::ImGuiRenderer::Update(const std::shared_ptr<Scene>& scene, const std::s
         }
     }
 
+    if (ImGui::CollapsingHeader("SSR"))
+    {
+        ImGui::SliderInt("MaxSteps: ", &ssrSettings.MaxSteps, 1, 500);
+        ImGui::SliderFloat("MaxDistance: ", &ssrSettings.MaxDistance, 0.0f, 20.0f);
+        ImGui::SliderInt("BSIterations: ", &ssrSettings.BinarySearchIterations, 0, 100);
+        ImGui::SliderFloat("Thickness: ", &ssrSettings.thickness, 0, 1.0f);
+        ImGui::SliderFloat("StepSize: ", &ssrSettings.StepSize, 0.0f, 0.5f);
+    }
+
+
     static bool enableTextureDebug = false;
     ImGui::Checkbox("Debug Textures", &enableTextureDebug);
     if (enableTextureDebug)

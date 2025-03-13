@@ -14,7 +14,7 @@ namespace
 	// Weights computed on the CPU and passed to GPU to allow user control over the gaussian blur
 	// Kernel & Sigma can be changed and the weights will be recomputed on the CPU and sent to the GPU
 	// Introduces some overhead since CPU data needs to be sent to GPU but we pay the cost once
-	// which allows flexibility in changing blur settings 
+	// which allows flexibility in changing blur settings
 	void ComputeGaussianKernel1D(float sigma, int kernelSize, std::vector<float>& offsets, std::vector<float>& combinedWeights)
 	{
 		int halfSize = kernelSize / 2;
@@ -28,7 +28,7 @@ namespace
 			sum += weight;
 		}
 
-		// Normalize 
+		// Normalize
 		for (float& weight : weights)
 		{
 			weight /= sum;
@@ -108,7 +108,7 @@ vk::Bloom::Bloom(Context& context, Image& inputImage) :
 	ComputeGaussianKernel1D(9.0f, 43, offsets, combinedWeights);
 
 	GuassianWeightsBuffer gaussianWeights = {};
-	
+
 	for (size_t i = 0; i < combinedWeights.size(); i++)
 	{
 		gaussianWeights.weights[i] = combinedWeights[i];
@@ -116,7 +116,7 @@ vk::Bloom::Bloom(Context& context, Image& inputImage) :
 	}
 
 	m_GPUWeightsBuffer.WriteToBuffer(gaussianWeights, sizeof(GuassianWeightsBuffer));
-	
+
 	BuildHorizontalBlurDescriptors();
 	BuildVerticalBlurDescriptors();
 
@@ -189,10 +189,10 @@ void vk::Bloom::CreateRenderPass()
 		.AddAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_SAMPLE_COUNT_1_BIT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 		.AddColorAttachmentRef(0, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
 
-		// External -> 0 : Color 
+		// External -> 0 : Color
 		.AddDependency(VK_SUBPASS_EXTERNAL, 0, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_DEPENDENCY_BY_REGION_BIT)
 
-		// 0 -> External : Color : Wait for color writing to finish on the attachment before the fragment shader tries to read from it 
+		// 0 -> External : Color : Wait for color writing to finish on the attachment before the fragment shader tries to read from it
 		.AddDependency(0, VK_SUBPASS_EXTERNAL, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_SHADER_READ_BIT, VK_DEPENDENCY_BY_REGION_BIT)
 		.Build();
 
@@ -210,7 +210,7 @@ void vk::Bloom::RenderHorizontalBlur(VkCommandBuffer cmd)
 {
 #ifdef _DEBUG
 	RenderPassLabel(cmd, "BloomHorizontalBlur");
-#endif 	
+#endif
 
 	VkRenderPassBeginInfo rpBegin{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
 	rpBegin.renderPass = m_renderPass;

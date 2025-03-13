@@ -3,7 +3,7 @@
 #include <vector>
 #include "Image.hpp"
 #include "Buffer.hpp"
-
+#include "Camera.hpp"
 namespace vk
 {
 	class Context;
@@ -11,7 +11,7 @@ namespace vk
 	class SSR
 	{
 	public:
-		explicit SSR(Context& context, const Image& inputImage, const Image& depthBuffer);
+		explicit SSR(Context& context, const Image& inputImage, const Image& depthBuffer, const Image& metallicRoughness, const Image& normalsTexture, std::shared_ptr<Camera> camera);
 		~SSR();
 
 		void Execute(VkCommandBuffer cmd);
@@ -29,6 +29,9 @@ namespace vk
 		Context& context;
 		const Image& inputImage;
 		const Image& depthBuffer;
+		const Image& metallicRoughness;
+		const Image& normalsTexture;
+		std::shared_ptr<Camera> camera;
 		Image m_RenderTarget;
 
 		uint32_t m_width;
@@ -40,5 +43,7 @@ namespace vk
 		VkPipeline m_Pipeline;
 		VkPipelineLayout m_PipelineLayout;
 		std::vector<VkDescriptorSet> m_DescriptorSets;
+		VkDescriptorSetLayout m_DescriptorSetLayout;
+		std::vector<Buffer> m_SSRUniform;
 	};
 }

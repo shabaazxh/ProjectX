@@ -90,7 +90,8 @@ vk::Renderer::Renderer(Context& context) : context{context}
 	m_GBuffer	   = std::make_unique<GBuffer>(context, m_scene, m_camera);
 	m_DefLighting  = std::make_unique<DefLighting>(context, m_camera, m_GBuffer->GetGBufferMRT(), m_ShadowMap->GetRenderTarget(), m_scene);
 	m_Bloom		   = std::make_unique<Bloom>(context, m_DefLighting->GetBrightnessRenderTarget());
-	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget());
+	m_SSR		   = std::make_unique<SSR>(context, m_DefLighting->GetRenderTarget(), m_GBuffer->GetGBufferMRT().DepthTarget, m_GBuffer->GetGBufferMRT().MetRoughnessTarget, m_GBuffer->GetGBufferMRT().NormalTarget, m_camera);
+	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget(), m_SSR->GetRenderTarget());
 	m_PresentPass  = std::make_unique<PresentPass>(context, m_ForwardPass->GetRenderTarget(), m_DefComposite->GetRenderTarget(), m_MeshDensity->GetRenderTarget());
 
 	ImGuiRenderer::Initialize(context);
@@ -102,6 +103,7 @@ void vk::Renderer::Destroy()
 	vkDeviceWaitIdle(context.device);
 
 	ImGuiRenderer::Shutdown(context);
+	m_SSR.reset();
 	m_DepthPrepass.reset();
 	m_MeshDensity.reset();
 	m_ForwardPass.reset();
@@ -242,6 +244,7 @@ void vk::Renderer::Render()
 		m_GBuffer->Resize();
 		m_DefLighting->Resize();
 		m_Bloom->Resize();
+		m_SSR->Resize();
 		m_DefComposite->Resize();
 		m_PresentPass->Resize();
 	}
@@ -278,7 +281,8 @@ void vk::Renderer::Render()
 			m_GBuffer->Execute(cmd);
 			m_DefLighting->Execute(cmd);
 			m_Bloom->Execute(cmd);
-			m_DefComposite->Execute(cmd);
+			m_SSR->Execute(cmd);
+;			m_DefComposite->Execute(cmd);
 		}
 
 		m_PresentPass->Execute(cmd, index);
@@ -340,6 +344,7 @@ void vk::Renderer::Present(uint32_t imageIndex)
 		m_GBuffer->Resize();
 		m_DefLighting->Resize();
 		m_Bloom->Resize();
+		m_SSR->Resize();
 		m_DefComposite->Resize();
 		m_PresentPass->Resize();
 	}
@@ -355,6 +360,7 @@ void vk::Renderer::Update(double deltaTime)
 	m_ShadowMap->Update();
 	m_ForwardPass->Update();
 	m_DefLighting->Update();
+	m_SSR->Update();
 	m_PresentPass->Update();
 }
 

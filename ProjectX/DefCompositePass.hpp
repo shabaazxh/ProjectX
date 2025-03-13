@@ -11,7 +11,7 @@ namespace vk
 	class DefCompositePass
 	{
 	public:
-		explicit DefCompositePass(Context& context, Image& defLightingPass, Image& BloomPass);
+		explicit DefCompositePass(Context& context, Image& defLightingPass, Image& BloomPass, const Image& SSRPass);
 		~DefCompositePass();
 
 		void Execute(VkCommandBuffer cmd);
@@ -30,6 +30,7 @@ namespace vk
 		Image m_RenderTarget;
 		Image& defLightingPass;
 		Image& BloomPass;
+		const Image& SSRPass;
 
 		VkPipeline m_Pipeline;
 		VkPipelineLayout m_PipelineLayout;

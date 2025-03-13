@@ -15,7 +15,9 @@
 #include "DefCompositePass.hpp"
 #include "ShadowMap.hpp"
 #include "Bloom.hpp"
+#include "SSR.h"
 #include "ImGuiRenderer.hpp"
+
 
 //Deferred
 namespace vk
@@ -64,6 +66,7 @@ namespace vk
 		std::unique_ptr<GBuffer>		  m_GBuffer;
 		std::unique_ptr<DefLighting>	  m_DefLighting;
 		std::unique_ptr<Bloom>			  m_Bloom;
+		std::unique_ptr<SSR>              m_SSR;
 		std::unique_ptr<DefCompositePass> m_DefComposite;
 		std::unique_ptr<PresentPass>	  m_PresentPass;
 

@@ -5,10 +5,11 @@
 #include "Buffer.hpp"
 #include "RenderPass.hpp"
 
-vk::DefCompositePass::DefCompositePass(Context& context, Image& defLightingPass, Image& BloomPass) :
+vk::DefCompositePass::DefCompositePass(Context& context, Image& defLightingPass, Image& BloomPass, const Image& SSRPass) :
 	context{ context },
 	defLightingPass{ defLightingPass },
 	BloomPass{BloomPass},
+	SSRPass{SSRPass},
 	m_Pipeline{ VK_NULL_HANDLE },
 	m_PipelineLayout{ VK_NULL_HANDLE },
 	m_descriptorSetLayout{ VK_NULL_HANDLE },
@@ -95,6 +96,17 @@ void vk::DefCompositePass::Resize()
 
 		UpdateDescriptorSet(context, 1, imageInfo, m_descriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 	}
+
+	for (size_t i = 0; i < (size_t)MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		VkDescriptorImageInfo imageInfo = {
+			.sampler = repeatSamplerAniso,
+			.imageView = SSRPass.imageView,
+			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		};
+
+		UpdateDescriptorSet(context, 2, imageInfo, m_descriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+	}
 }
 
 
@@ -151,7 +163,7 @@ void vk::DefCompositePass::Update()
 
 void vk::DefCompositePass::CreatePipeline()
 {
-	// Create the pipeline 
+	// Create the pipeline
 	auto pipelineResult = vk::PipelineBuilder(context.device, PipelineType::GRAPHICS, VertexBinding::NONE, 0)
 		.AddShader("../Engine/assets/shaders/fs_tri.vert.spv", ShaderType::VERTEX)
 		.AddShader("../Engine/assets/shaders/defComposite.frag.spv", ShaderType::FRAGMENT)
@@ -176,10 +188,10 @@ void vk::DefCompositePass::CreateRenderPass()
 	m_renderPass = builder
 		.AddAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_SAMPLE_COUNT_1_BIT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 		.AddColorAttachmentRef(0, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
-		// External -> 0 : Color 
+		// External -> 0 : Color
 		.AddDependency(VK_SUBPASS_EXTERNAL, 0, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_DEPENDENCY_BY_REGION_BIT)
 
-		// 0 -> External : Color : Wait for color writing to finish on the attachment before the fragment shader tries to read from it 
+		// 0 -> External : Color : Wait for color writing to finish on the attachment before the fragment shader tries to read from it
 		.AddDependency(0, VK_SUBPASS_EXTERNAL, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_SHADER_READ_BIT, VK_DEPENDENCY_BY_REGION_BIT)
 		.Build();
 
@@ -212,6 +224,7 @@ void vk::DefCompositePass::BuildDescriptors()
 		std::vector<VkDescriptorSetLayoutBinding> bindings = {
 			CreateDescriptorBinding(0, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT),
 			CreateDescriptorBinding(1, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT),
+			CreateDescriptorBinding(2, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT),
 		};
 
 		m_descriptorSetLayout = CreateDescriptorSetLayout(context, bindings);
@@ -241,5 +254,16 @@ void vk::DefCompositePass::BuildDescriptors()
 		};
 
 		UpdateDescriptorSet(context, 1, imageInfo, m_descriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+	}
+
+	for (size_t i = 0; i < (size_t)MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		VkDescriptorImageInfo imageInfo = {
+			.sampler = repeatSamplerAniso,
+			.imageView = SSRPass.imageView,
+			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		};
+
+		UpdateDescriptorSet(context, 2, imageInfo, m_descriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 	}
 }
