@@ -25,24 +25,12 @@
 
 #include <iostream>
 
-
-// My includes
 #include "Utils.hpp"
 #include "Context.hpp"
 #include "Engine.hpp"
 
-namespace
-{
-
-
-	// Local types/structures:
-
-}
-
 int main() try
 {
-	//TODO-implement me.
-
 	vk::Engine engine;
 
 	if (!engine.Initialize())
@@ -62,5 +50,3 @@ catch( std::exception const& eErr )
 	return 1;
 }
 
-
-//EOF vim:syntax=cpp:foldmethod=marker:ts=4:noexpandtab:
