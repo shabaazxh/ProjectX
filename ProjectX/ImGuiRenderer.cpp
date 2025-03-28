@@ -77,19 +77,19 @@ void vk::ImGuiRenderer::Update(const std::shared_ptr<Scene>& scene, const std::s
     static const float distance = 1.0f;
 
     if (!initialized) {
-        SunElevation = -2.7f; // default elevation
-        SunAzimuthal = -90.0f; // default azimuth
+        SunElevation = -0.18f; // default elevation
+        SunAzimuthal = -1.55f; // default azimuth
         initialized = true;
     }
 
     // Phis is elevation
     // Theta is azimuthal
-    const float ElevationPhi = glm::radians(SunElevation);
-    const float AzimuthalTheta = glm::radians(SunAzimuthal);
+    const float ElevationPhi = (SunElevation);
+    const float AzimuthalTheta = (SunAzimuthal);
 
     const float x = cosf(ElevationPhi) * cosf(AzimuthalTheta) * distance;
-    const float z = cosf(ElevationPhi) * sinf(AzimuthalTheta) * distance;
     const float y = sinf(ElevationPhi) * distance;
+    const float z = cosf(ElevationPhi) * sinf(AzimuthalTheta) * distance;
 
     auto& lights = scene->GetLights();
     if (lights.empty()) return;
@@ -104,13 +104,13 @@ void vk::ImGuiRenderer::Update(const std::shared_ptr<Scene>& scene, const std::s
     if (ImGui::CollapsingHeader("Directional Light"))
     {
         ImGui::Text("Sun Angles");
-        ImGui::SliderFloat("Elevation - Phi", &SunElevation, -90.0f, 90.0f, "%.2f");
-        ImGui::SliderFloat("Azimuthal - Theta", &SunAzimuthal, -90.0f, 90.0f, "%.2f");
+        ImGui::SliderFloat("Elevation - Phi", &SunElevation, -1.5708f, 1.5708f, "%.2f");
+        ImGui::SliderFloat("Azimuthal - Theta", &SunAzimuthal, -3.141f, 3.141f, "%.2f");
 
         ImGui::Text("Light Camera Settings");
         ImGui::SliderFloat("View", &sunLight.View, -200.0f, 200.0f, "%.2f");
-        ImGui::SliderFloat("Near", &sunLight.Near, 0.1f, 100.0f, "%.2f");
-        ImGui::SliderFloat("Far", &sunLight.Far, 0.1f, 1000.0f, "%.2f");
+        ImGui::SliderFloat("Near", &sunLight.Near, -200.1f, 100.0f, "%.2f");
+        ImGui::SliderFloat("Far", &sunLight.Far, 0.1f, 50.0f, "%.2f");
     }
 
     if (ImGui::CollapsingHeader("Lights")) {

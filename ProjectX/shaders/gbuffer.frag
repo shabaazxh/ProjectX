@@ -25,7 +25,7 @@ layout(set = 0, binding = 0) uniform SceneUniform
 layout(push_constant) uniform Push
 {
 	mat4 ModelMatrix;
-	uint dTextureID; // diffuse 
+	uint dTextureID; // diffuse
 	uint mTextureID; // metalness
 	uint rTextureID; // roughness
 	uint eTextureID; // emissive
@@ -40,7 +40,7 @@ void main()
 {
 	vec4 color = texture(sampler2D(textures[pc.dTextureID], samplerAnisotropic), uv);
 	albedo = color;
-	//normal = vec4(WorldNormal) * 0.5 + 0.5;	
+	//normal = vec4(WorldNormal) * 0.5 + 0.5;
 	vec3 texNormal = texture(sampler2D(textures[pc.nTextureID], samplerAnisotropic), uv).rgb * 2.0 - 1.0;
 
 	texNormal = (TBN * texNormal);

@@ -44,8 +44,10 @@ void vk::ExecuteSingleTimeCommands(Context& context, std::function<void(VkComman
 		.pCommandBuffers = &cmd
 	};
 
-	vkQueueSubmit(context.graphicsQueue, 1, &submitInfo, fence);
-	vkQueueWaitIdle(context.graphicsQueue);
+	VkResult result = vkQueueSubmit(context.graphicsQueue, 1, &submitInfo, fence);
+	//vkQueueWaitIdle(context.graphicsQueue);
+
+	VK_CHECK(vkWaitForFences(context.device, 1, &fence, VK_TRUE, UINT64_MAX), "Failed to wait for fence.");
 
 	vkFreeCommandBuffers(context.device, context.transientCommandPool, 1, &cmd);
 	vkDestroyFence(context.device, fence, nullptr);
@@ -54,13 +56,13 @@ void vk::ExecuteSingleTimeCommands(Context& context, std::function<void(VkComman
 }
 
 void vk::ImageBarrier(
-	VkCommandBuffer cmd, 
-	VkImage img, 
-	VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask, 
-	VkImageLayout srcLayout, VkImageLayout dstLayout, 
-	VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask, 
-	VkImageSubresourceRange subresourceRange, 
-	uint32_t srcQueueFamilyIndex, 
+	VkCommandBuffer cmd,
+	VkImage img,
+	VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask,
+	VkImageLayout srcLayout, VkImageLayout dstLayout,
+	VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
+	VkImageSubresourceRange subresourceRange,
+	uint32_t srcQueueFamilyIndex,
 	uint32_t dstQueueFamilyIndex)
 {
 	VkImageMemoryBarrier imgBarrier = {
@@ -104,7 +106,7 @@ void vk::AllocateDescriptorSets(Context& context, VkDescriptorPool descriptorPoo
 	VK_CHECK(vkAllocateDescriptorSets(context.device, &allocInfo, descriptorSet.data()), "Failed to allocate descriptor sets");
 }
 
-// Define a descriptor set layout binding 
+// Define a descriptor set layout binding
 // binding = which index slot to bind to e.g. 0,1,2..
 // type = what is the layout binding type e.g. uniform or sampler
 // shadeStage = which shader will this be accessed and used in? e.g. vertex, fragment or both
@@ -147,7 +149,7 @@ void vk::UpdateDescriptorSet(Context& context, uint32_t binding, VkDescriptorIma
 	vkUpdateDescriptorSets(context.device, 1, &descriptorWrite, 0, nullptr);
 }
 
-VkSampler vk::CreateSampler(Context& context, VkSamplerAddressMode mode, VkBool32 EnableAnisotropic, VkCompareOp compareOp, 
+VkSampler vk::CreateSampler(Context& context, VkSamplerAddressMode mode, VkBool32 EnableAnisotropic, VkCompareOp compareOp,
 	VkFilter magFilter, VkFilter minFilter, VkSamplerMipmapMode samplerMipmapMode)
 {
 	VkSamplerCreateInfo samplerInfo{};

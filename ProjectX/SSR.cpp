@@ -50,6 +50,10 @@ void vk::SSR::Update()
 
 vk::SSR::~SSR()
 {
+    for (auto& buffer : m_SSRUniform)
+    {
+        buffer.Destroy(context.device);
+    }
     m_RenderTarget.Destroy(context.device);
     vkDestroyPipeline(context.device, m_Pipeline, nullptr);
     vkDestroyPipelineLayout(context.device, m_PipelineLayout, nullptr);

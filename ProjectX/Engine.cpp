@@ -42,7 +42,7 @@ void vk::Engine::Shutdown()
 {
 	m_Renderer->Destroy();
 	m_Renderer.reset();
-	m_context.Destroy(); // Free vulkan device, allocator, window 
+	m_context.Destroy(); // Free vulkan device, allocator, window
 }
 
 void vk::Engine::Run()

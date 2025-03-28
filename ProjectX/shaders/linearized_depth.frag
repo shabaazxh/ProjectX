@@ -24,7 +24,7 @@ float LinearizeDepth()
     float d = gl_FragCoord.z;
     float zNear = ubo.nearPlane;
     float zFar = ubo.farPlane;
-	return (zFar * zNear) / (zFar - zNear) / (d + zFar / (zNear - zFar));   
+	return (zFar * zNear) / (zFar - zNear) / (d + zFar / (zNear - zFar));
 }
 
 void main()

@@ -176,8 +176,6 @@ float Shadow(vec3 WorldPos)
 // https://developer.nvidia.com/gpugems/gpugems/part-ii-lighting-and-shadows/chapter-11-shadow-map-antialiasing
 float PCF(vec3 WorldPos)
 {
-    vec3 lightDir = normalize(lightData.lights[0].LightPosition.xyz - WorldPos.xyz);
-
 	// Use direct lighting only. Point light shadows are handleded differently (cube depth)
 	vec4 fragPositionInLightSpace = lightData.lights[0].LightSpaceMatrix * vec4(WorldPos, 1.0);
 	fragPositionInLightSpace.xyz /= fragPositionInLightSpace.w;
@@ -235,6 +233,7 @@ void main()
 		else {
 			lightDir = normalize(-lightData.lights[i].LightPosition.xyz);
 			LightColour = lightData.lights[i].LightColour.rgb;
+			halfVector = normalize(viewDir + lightDir);
 		}
 
 		// Apply shadow only to direct lighting

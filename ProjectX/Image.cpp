@@ -19,7 +19,7 @@ namespace {
 }
 
 
-vk::Image::Image(const std::string name, VmaAllocator allocator, VkImage image, VkImageView imageView, VmaAllocation allocation) noexcept :
+vk::Image::Image(const std::string name, uint32_t width, uint32_t height, VmaAllocator allocator, VkImage image, VkImageView imageView, VmaAllocation allocation) noexcept :
 	name{name}, allocation{allocation}, image{image}, imageView{imageView}, allocator{allocator} {}
 
 
@@ -29,7 +29,7 @@ vk::Image::Image(Image&& other) noexcept :
 	image(std::exchange(other.image, VK_NULL_HANDLE)),
 	imageView(std::exchange(other.imageView, VK_NULL_HANDLE)),
 	allocator(std::exchange(other.allocator, VK_NULL_HANDLE)) {}
-	
+
 
 vk::Image& vk::Image::operator=(vk::Image&& other) noexcept
 {
@@ -49,7 +49,7 @@ void vk::Image::Destroy(VkDevice device)
 		assert(allocator != VK_NULL_HANDLE);
 		assert(allocation != VK_NULL_HANDLE);
 		vkDestroyImageView(device, imageView, nullptr);
-		vmaDestroyImage(allocator, image, allocation);		
+		vmaDestroyImage(allocator, image, allocation);
 	}
 }
 
@@ -119,8 +119,8 @@ vk::Image vk::LoadTextureFromDisk(const std::string& path, Context& context)
 
 	ExecuteSingleTimeCommands(context, [&](VkCommandBuffer cmd)
 		{
-			// Transition from LAYOUT_UNDEFINED to LAYOUT_TRANSFER_DST_OPTIMAL to copy contents 
-			// from buffer to the image 
+			// Transition from LAYOUT_UNDEFINED to LAYOUT_TRANSFER_DST_OPTIMAL to copy contents
+			// from buffer to the image
 			ImageBarrier(
 				cmd,
 				img.image,
@@ -143,8 +143,8 @@ vk::Image vk::LoadTextureFromDisk(const std::string& path, Context& context)
 
 			vkCmdCopyBufferToImage(cmd, stagingBuffer.buffer, img.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopy);
 
-			// Transition from DST_OPTIMAL Layout to SRC_OPTIMAL since it'll 
-			// be used as a SOURCE of a transfer operation during mip generation 
+			// Transition from DST_OPTIMAL Layout to SRC_OPTIMAL since it'll
+			// be used as a SOURCE of a transfer operation during mip generation
 			ImageBarrier(
 				cmd,
 				img.image,
@@ -231,7 +231,7 @@ vk::Image vk::LoadTextureFromDisk(const std::string& path, Context& context)
 	return img;
 }
 
-vk::Image vk::CreateImageTexture2D(const std::string name, Context& context, uint32_t width, uint32_t height, VkFormat format, VkImageUsageFlags usage, VkImageAspectFlags imageaspectFlags, uint32_t mipLevels)
+vk::Image vk::CreateImageTexture2D(const std::string name, Context& context, uint32_t width, uint32_t height, VkFormat format, VkImageUsageFlags usage, VkImageAspectFlags imageaspectFlags, uint32_t mipLevels, VkImageCreateFlags flags, uint32_t arrayLayers)
 {
 	VkImageCreateInfo imageInfo{ VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 	imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -239,13 +239,14 @@ vk::Image vk::CreateImageTexture2D(const std::string name, Context& context, uin
 	imageInfo.extent.height = height;
 	imageInfo.extent.depth = 1;
 	imageInfo.mipLevels = mipLevels;
-	imageInfo.arrayLayers = 1;
+	imageInfo.arrayLayers = arrayLayers;
 	imageInfo.format = format;
 	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	imageInfo.usage = usage;
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageInfo.flags = flags;
 
 	VmaAllocationCreateInfo allocInfo{};
 	allocInfo.flags = 0;
@@ -264,10 +265,10 @@ vk::Image vk::CreateImageTexture2D(const std::string name, Context& context, uin
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = image;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.viewType = (flags & VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) != 0 ? VK_IMAGE_VIEW_TYPE_CUBE : VK_IMAGE_VIEW_TYPE_2D;
 	viewInfo.format = format;
 	viewInfo.components = VkComponentMapping{};
-	viewInfo.subresourceRange = VkImageSubresourceRange{ imageaspectFlags, 0, VK_REMAINING_MIP_LEVELS, 0, 1 };
+	viewInfo.subresourceRange = VkImageSubresourceRange{ imageaspectFlags, 0, VK_REMAINING_MIP_LEVELS, 0, VK_REMAINING_ARRAY_LAYERS };
 
 	VkImageView imageView = VK_NULL_HANDLE;
 	VK_CHECK(vkCreateImageView(context.device, &viewInfo, nullptr, &imageView), "Failed to create image view");
@@ -275,5 +276,5 @@ vk::Image vk::CreateImageTexture2D(const std::string name, Context& context, uin
 	context.SetObjectName(context.device, (uint64_t)imageView, VK_OBJECT_TYPE_IMAGE_VIEW, name.c_str());
 
 
-	return vk::Image(name, context.allocator, image, imageView, allocation);
+	return vk::Image(name, width, height, context.allocator, image, imageView, allocation);
 }

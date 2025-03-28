@@ -202,6 +202,20 @@
       <Outputs>../../assets/shaders/shadow_map.vert.spv</Outputs>
       <Message>GLSLC: [VERT] '%(Filename)%(Extension)'</Message>
     </CustomBuild>
+    <CustomBuild Include="skybox.frag">
+      <FileType>Document</FileType>
+      <Command>IF NOT EXIST "$(SolutionDir)\assets\shaders" (mkdir "$(SolutionDir)\assets\shaders")
+"$(SolutionDir)/third_party/shaderc/win-x86_64/glslc.exe" -O --target-env=vulkan1.2 -g -O0 -o "$(SolutionDir)/assets/shaders/%(Filename)%(Extension).spv" "%(Identity)"</Command>
+      <Outputs>../../assets/shaders/skybox.frag.spv</Outputs>
+      <Message>GLSLC: [FRAG] '%(Filename)%(Extension)'</Message>
+    </CustomBuild>
+    <CustomBuild Include="skybox.vert">
+      <FileType>Document</FileType>
+      <Command>IF NOT EXIST "$(SolutionDir)\assets\shaders" (mkdir "$(SolutionDir)\assets\shaders")
+"$(SolutionDir)/third_party/shaderc/win-x86_64/glslc.exe" -O --target-env=vulkan1.2 -g -O0 -o "$(SolutionDir)/assets/shaders/%(Filename)%(Extension).spv" "%(Identity)"</Command>
+      <Outputs>../../assets/shaders/skybox.vert.spv</Outputs>
+      <Message>GLSLC: [VERT] '%(Filename)%(Extension)'</Message>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

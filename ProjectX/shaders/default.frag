@@ -35,7 +35,7 @@ layout(set = 0, binding = 1) uniform LightBuffer {
 layout(push_constant) uniform Push
 {
 	mat4 ModelMatrix;
-	uint dTextureID; // diffuse 
+	uint dTextureID; // diffuse
 	uint mTextureID; // metalness
 	uint rTextureID; // roughness
 	uint eTextureID; // emissive
@@ -88,7 +88,7 @@ float GeometryTerm(vec3 normal, vec3 halfVector, vec3 lightDir, vec3 viewDir)
 	return G;
 }
 
-// Compute BRDF 
+// Compute BRDF
 vec3 CookTorranceBRDF(vec3 normal, vec3 halfVector, vec3 viewDir, vec3 lightDir, float metallic, float roughness, vec3 baseColor, vec3 LightColour)
 {
     vec3 F = Fresnel(halfVector, viewDir, baseColor, metallic);
@@ -138,21 +138,22 @@ void main()
 		vec3 LightColour = vec3(0.0);
 		bool isDirectional = lightData.lights[i].Type == 1 ? false : true;
 
-		if(!isDirectional) 
+		if(!isDirectional)
 		{
 			float dist = length(lightData.lights[i].LightPosition.xyz - WorldPos.xyz);
-			float att = 1.0 / (dist * dist); 
+			float att = 1.0 / (dist * dist);
 			LightColour = lightData.lights[i].LightColour.xyz * att;
 		}
 		else {
+			lightDir = normalize(lightData.lights[i].LightPosition.xyz);
 			LightColour = lightData.lights[i].LightColour.rgb;
 		}
 
 		if(isDirectional) {
 			//float shadowTerm = 1.0 - PCF(WorldPos, wNormal);
 			outLight += CookTorranceBRDF(wNormal, halfVector, viewDir, lightDir, metallic, roughness, color.xyz, LightColour);
-			
-		} 
+
+		}
 		else {
 			outLight += CookTorranceBRDF(wNormal, halfVector, viewDir, lightDir, metallic, roughness, color.xyz, LightColour);
 		}
@@ -161,5 +162,5 @@ void main()
 	vec3 ambient = vec3(0.02) * color.xyz;
 	outLight += ambient;
 	fragColor = vec4(vec3(outLight + emissive), 1.0);
-	
+
 }

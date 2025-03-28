@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include "Camera.hpp"
+#include "Skybox.hpp"
 
 namespace vk
 {
@@ -41,5 +42,7 @@ namespace vk
 		std::shared_ptr<Camera> camera;
 		std::vector<VkDescriptorSet> m_descriptorSets;
 		std::unordered_map<int, std::pair<VkPipeline, VkPipelineLayout>> m_pipelines;
+
+		std::unique_ptr<Skybox> m_Skybox;
 	};
 }

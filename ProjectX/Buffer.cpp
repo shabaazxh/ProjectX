@@ -7,7 +7,7 @@ vk::Buffer::Buffer() noexcept : buffer{ VK_NULL_HANDLE }, allocation{ VK_NULL_HA
 vk::Buffer::Buffer(const std::string& name, VmaAllocator allocator, VkBuffer buffer, VmaAllocation allocation) :
     buffer{ buffer }, allocation{ allocation }, allocator{ allocator }, name{ name } {}
 
-vk::Buffer::Buffer(Buffer&& other) noexcept : 
+vk::Buffer::Buffer(Buffer&& other) noexcept :
     buffer(std::exchange(other.buffer, VK_NULL_HANDLE)),
     allocation(std::exchange(other.allocation, VK_NULL_HANDLE)),
     allocator(std::exchange(other.allocator, VK_NULL_HANDLE)),
@@ -41,10 +41,11 @@ vk::Buffer vk::CreateBuffer(const std::string& name, Context& context, VkDeviceS
 		.usage = usage
 	};
 
-	VmaAllocationCreateInfo allocInfo = {
-		.flags = memoryFlags,
-		.usage = memUsage
-	};
+    VmaAllocationCreateInfo allocInfo = {
+	    .flags = memoryFlags,
+	    .usage = memUsage,
+        .requiredFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    };
 
 	VkBuffer buffer = VK_NULL_HANDLE;
 	VmaAllocation allocation = VK_NULL_HANDLE;
@@ -74,7 +75,7 @@ void vk::CreateAndUploadBuffer(vk::Context& context, const void* data, VkDeviceS
 
     // Perform the copy operation using single-time commands
     ExecuteSingleTimeCommands(context, [&](VkCommandBuffer cmd) {
-        
+
         VkBufferCopy copy = {
             .size = size
         };

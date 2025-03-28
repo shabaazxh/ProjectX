@@ -41,10 +41,13 @@ vk::ForwardPass::ForwardPass(Context& context, Image& shadowMap, Image& depthPre
 	CreateRenderPass();
 	CreateFramebuffer();
 	CreatePipeline();
+
+	m_Skybox = std::make_unique<Skybox>(context, m_DepthTarget, camera, m_renderPass);
 }
 
 vk::ForwardPass::~ForwardPass()
 {
+	m_Skybox.reset();
 	m_RenderTarget.Destroy(context.device);
 	m_DepthTarget.Destroy(context.device);
 
@@ -130,6 +133,9 @@ void vk::ForwardPass::Execute(VkCommandBuffer cmd)
 	vkCmdSetScissor(cmd, 0, 1, &scissor);
 
 	vkCmdBeginRenderPass(cmd, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+	m_Skybox->Execute(cmd);
+
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelines[setRenderingPipeline].first);
 	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelines[setRenderingPipeline].second, 0, 1, &m_descriptorSets[currentFrame], 0, nullptr);
 

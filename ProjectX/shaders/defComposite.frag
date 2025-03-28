@@ -16,7 +16,7 @@ void main()
 	vec4 bloom = texture(bloomPass, uv);
 	vec4 ssr = texture(SSR, uv);
 
-	vec4 result = lighting + ssr + bloom;
+	vec4 result = lighting + ssr;
 
 	vec3 hdrColor = result.rgb;
 	vec3 ldrColor = hdrColor / (hdrColor + vec3(1.0));

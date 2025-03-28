@@ -24,7 +24,6 @@
 #include "baked_model.hpp"
 
 #include <iostream>
-
 #include "Utils.hpp"
 #include "Context.hpp"
 #include "Engine.hpp"
