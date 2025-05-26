@@ -4,6 +4,8 @@ Deferred is the default and most developed. Use Keys: 9 and 0 to switch between 
 
 This renderer is for me to experiment with various graphics techniques.
 
+![Hero Image](showcase/hero.png)
+
 ## Rendering features: 
 * Physically Based Shading (GGX)
 * Screen-Space Reflections (SSR)
