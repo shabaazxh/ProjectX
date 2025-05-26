@@ -4,6 +4,7 @@
 #include "Image.hpp"
 #include "Buffer.hpp"
 #include "Camera.hpp"
+
 namespace vk
 {
 	class Context;
@@ -25,12 +26,14 @@ namespace vk
 		void BuildDescriptors();
 		void CreateFramebuffer();
 		void CreateRenderPass();
+	    void GenerateNoiseTexture(uint32_t width, uint32_t height);
 
 		Context& context;
 		const Image& depthBuffer;
 		const Image& normalsTexture;
 		std::shared_ptr<Camera> camera;
 		Image m_RenderTarget;
+	    Image m_NoiseTexture;
 
 		uint32_t m_width;
 		uint32_t m_height;

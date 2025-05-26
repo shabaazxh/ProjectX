@@ -29,30 +29,25 @@ layout(set = 0, binding = 1) uniform SSAOSettings
 
 layout(set = 0, binding = 2) uniform sampler2D depthBuffer;
 layout(set = 0, binding = 3) uniform sampler2D normalsTexture;
+layout(set = 0, binding = 4) uniform sampler2D NoiseTexture;
 
 #define PI 3.14159265359
 
-vec4 DepthToPosition(vec2 uv)
+vec4 DepthToPosition(vec2 uv, float depth)
 {
-	float depth = texture(depthBuffer, uv).x;
 	vec4 clipSpace = vec4(uv * 2.0 - 1.0, depth, 1.0);
 	vec4 viewSpace = inverse(ubo.projection) * clipSpace;
 	viewSpace.xyz /= viewSpace.w;
 
-	vec4 worldPos = inverse(ubo.view) * vec4(viewSpace.xyz, 1.0);
-	return vec4(worldPos.xyz, 1.0);
+	return vec4(viewSpace.xyz, 1.0);
 }
 
-vec4 DepthToNormal(vec2 uv)
+vec4 DepthToNormal(vec2 uv, float depth)
 {
-	float depth = texture(depthBuffer, uv).x;
-
-	vec4 viewPosition = DepthToPosition(uv);
-
-	vec3 n = normalize(cross(dFdx(viewPosition.xyz), dFdy(viewPosition.xyz)));
+	vec4 viewPosition = DepthToPosition(uv, depth);
+	vec3 n = (cross(dFdx(viewPosition.xyz), dFdy(viewPosition.xyz)));
 	n *= -1;
-
-	return vec4(n, 1.0);
+	return vec4(normalize(n), 1.0);
 }
 
 float rand(vec2 co) {
@@ -73,92 +68,75 @@ vec2 snapToTexelCenter(vec2 texCoord, vec2 texSize) {
 
 vec4 GetJitter()
 {
-    //return texture(generatedNoiseTex, (gl_FragCoord.xy / 4.0));
-
-	return vec4(rand(uv));
+    return texture(NoiseTexture, (gl_FragCoord.xy / 4.0));
 }
 
-float SSAO()
-{
-	int NUMBER_OF_SAMPLING_DIRECTIONS = ssao.NumDirections;//22;
-	float NUMBER_OF_STEPS = ssao.NumSteps;//4;
-	float STEP = ssao.StepSize;//0.002;
-    float RADIUS = ssao.Radius;//2.2;
+float NUMBER_OF_SAMPLING_DIRECTIONS = ssao.NumDirections;
+float STEP = ssao.StepSize; //0.04
+float NUMBER_OF_STEPS = ssao.NumSteps;
+float TANGENT_BIAS = 0.523599;
+float HalfPI = 0.5 * PI;
+float TAU = 2 * PI;
+float RADIUS = ssao.Radius;
+float RADIUS2 = RADIUS * RADIUS;
+float invNumDirections = 1.0 / NUMBER_OF_SAMPLING_DIRECTIONS;
 
+float HBAO()
+{
 	float ao = 0.0;
 	float occlusion = 0.0;
 
-	// get the current fragments world pos and normal
-	vec4 WorldPos = DepthToPosition(uv);
-	vec4 WorldNormal = normalize(vec4(texture(normalsTexture, uv)));
+	float fragmentDepth = texture(depthBuffer, uv).x;
+    vec4 normal = DepthToNormal(uv, fragmentDepth);
+	normal.y = -normal.y;
+    vec3 viewPosition = DepthToPosition(uv, fragmentDepth).xyz;
 
-	// convert to view-space
-	vec4 viewSpacePos = ubo.view * vec4(WorldPos.xyz, 1.0);
-	vec4 viewSpaceNormal = normalize(ubo.view * vec4(WorldNormal.xyz, 0.0));
-
-	float samplingDisk = ((2 * PI * RADIUS)) / NUMBER_OF_SAMPLING_DIRECTIONS; // integral says its from 0-pi not from 0-2pi
-
+    float samplingDiskDirection = TAU / NUMBER_OF_SAMPLING_DIRECTIONS;
     vec4 Rand = GetJitter();
 
-	for(int i = 0; i < NUMBER_OF_SAMPLING_DIRECTIONS; i++)
-	{
-		float samplingAngle = i * samplingDisk; // tan(30.0 * PI / 180.0)
-		vec2 samplingDirection = RotateDirectionAngle(vec2(cos(samplingAngle), sin(samplingAngle)), Rand.xy);
+	// vec3(0,0,0) is camera position in view space
+	// float centerDepth = distance(vec3(0,0,0), viewPosition.xyz);
 
-		float tangentAngle = acos(dot(vec3(samplingDirection, 0.0), viewSpaceNormal.xyz)) - (0.5 * PI) + 0.3;
-		float horizonAngle = tangentAngle;
+    for(int i = 0; i < NUMBER_OF_SAMPLING_DIRECTIONS; i++) {
 
-		vec3 lastDifference = vec3(0);
+        float samplingDirectionAngle = i * samplingDiskDirection;
+        vec2 samplingDirection = RotateDirectionAngle(vec2(cos(samplingDirectionAngle), sin(samplingDirectionAngle)), Rand.xy);
 
-		for(int j = 0; j < NUMBER_OF_STEPS; j++)
-		{
-			// get the screen space position of the point
-            vec2 stepScreenSpace = uv + (Rand.z + float(j+1)) * STEP * samplingDirection;
+        float tangentAngle = acos(dot(vec3(samplingDirection, 0.0), normal.xyz)) - (HalfPI) + TANGENT_BIAS;
+        float horizonAngle = tangentAngle;
 
-			stepScreenSpace = snapToTexelCenter(stepScreenSpace, ubo.viewportSize);
+        vec3 LastDifference = vec3(0);
+        for(int j = 0; j < NUMBER_OF_STEPS; j++){
 
-			// depth buffer z value stored at the location the ray is
-			float steppedLocationZ = texture(depthBuffer, stepScreenSpace.st).x;
+            vec2 stepForward = (Rand.z + float(j+1)) * STEP * samplingDirection;
+            vec2 stepPosition = uv + stepForward;
+			stepPosition = snapToTexelCenter(stepPosition, ubo.viewportSize);
 
-			// complete screen space point
-			vec3 steppedLocationPosition = vec3(stepScreenSpace, steppedLocationZ);
-			// NDC
-			vec3 steppedPositionNDC = vec3((2.0 * steppedLocationPosition.xy) - 1.0, steppedLocationPosition.z);
-			// unproject
-			vec4 steppedPositionUnproj = inverse(ubo.projection) * vec4(steppedPositionNDC, 1.0);
-			// back to view-space
-			vec3 viewSpaceSteppedPosition = vec3(steppedPositionUnproj.xyz / steppedPositionUnproj.w);
+			float depthAtPosition = texture(depthBuffer, stepPosition).x;
+			vec3 sampleViewPos = DepthToPosition(stepPosition, depthAtPosition).xyz;
+			vec3 diff = sampleViewPos - viewPosition;
 
-            vec3 diff = viewSpaceSteppedPosition.xyz - viewSpacePos.xyz;
+			float diffLenghSq = dot(diff, diff);
 
-            float t = length(diff) / RADIUS;
-			float u = 0.10;
+			bool inRadius = diffLenghSq < RADIUS2;
+			horizonAngle = inRadius ? max(horizonAngle, atan(diff.z / length(diff.xy))) : horizonAngle;
+			LastDifference = inRadius ? diff : LastDifference;
+        }
 
-			float contribution = (u * t) / (max(u, t) * max(u, t));
-			//ao += (max(0.0, contribution * NdotL)) / (dot(direction,direction) + 0.0001);
+        float norm = length(LastDifference) / RADIUS;
+        float attenuation = 1.0 - (norm * norm);
+		float sinHorizon = sin(horizonAngle);
+		float sinTangent = sin(tangentAngle);
 
-            bool inRadius = length(diff) < RADIUS;
-            occlusion = inRadius ?
-            (viewSpaceSteppedPosition.z > viewSpacePos.z ?
-            occlusion + max(0.0, max(dot(viewSpaceNormal.xyz, normalize(diff)) * contribution, 0.0)) / (dot(normalize(diff), normalize(diff) + 0.0001))
-            : occlusion)
-            : occlusion;
-		}
-	}
+        occlusion = clamp(attenuation * (sinHorizon - sinTangent), 0.0, 1.0);
+        ao += 1.0 - occlusion * ssao.sigma; // could apply intensity here
+    }
 
-    float k = ssao.k;
-    float sigma = ssao.sigma;
-    occlusion *= (2.0 * sigma) / float(NUMBER_OF_SAMPLING_DIRECTIONS);
-    occlusion = pow(max(0.0, 1.0 - occlusion), k);
-
-    ao = occlusion;
+    ao *= invNumDirections;
     return ao;
-
-	//ao = occlusion / float(NUMBER_OF_SAMPLING_DIRECTIONS) * SSAOSettings.k;
-	//return 1.0 - ao;
 }
 
 void main() {
 
-	fragColor = vec4(vec3(SSAO()), 1.0);
+	fragColor = vec4(vec3(HBAO()), 1.0);
 }

@@ -106,8 +106,8 @@ namespace vk
 	inline double deltaTime;
 	inline uint32_t setRenderingPipeline = 1;
 	inline uint32_t setAlphaMakingPipeline = 5;
-	inline SSRSettings ssrSettings = { 20, 1, 1.0f, 0.001f, 0.001f };
-	inline SSAOSettings ssaoSettings = {};
+	inline SSRSettings ssrSettings = { 20, 1, 0.0f, 0.001f, 0.001f };
+	inline SSAOSettings ssaoSettings = {6,6, 1.0f, 0.005, 0.0f, 1.7f, 0.0f};
 }
 
 namespace vk

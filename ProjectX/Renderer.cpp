@@ -92,7 +92,7 @@ vk::Renderer::Renderer(Context& context) : context{context}
 	m_Bloom		   = std::make_unique<Bloom>(context, m_DefLighting->GetBrightnessRenderTarget());
 	m_SSR		   = std::make_unique<SSR>(context, m_DefLighting->GetRenderTarget(), m_GBuffer->GetGBufferMRT().DepthTarget, m_GBuffer->GetGBufferMRT().MetRoughnessTarget, m_GBuffer->GetGBufferMRT().NormalTarget, m_camera);
 	m_SSAO		   = std::make_unique<SSAO>(context, m_GBuffer->GetGBufferMRT().DepthTarget, m_GBuffer->GetGBufferMRT().NormalTarget, m_camera);
-	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget(), m_SSR->GetRenderTarget());
+	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget(), m_SSR->GetRenderTarget(), m_SSAO->GetRenderTarget());
 	m_PresentPass  = std::make_unique<PresentPass>(context, m_ForwardPass->GetRenderTarget(), m_DefComposite->GetRenderTarget(), m_MeshDensity->GetRenderTarget());
 
 	ImGuiRenderer::Initialize(context);
