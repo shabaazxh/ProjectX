@@ -134,7 +134,7 @@ void vk::ForwardPass::Execute(VkCommandBuffer cmd)
 
 	vkCmdBeginRenderPass(cmd, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	m_Skybox->Execute(cmd);
+	// m_Skybox->Execute(cmd);
 
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelines[setRenderingPipeline].first);
 	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelines[setRenderingPipeline].second, 0, 1, &m_descriptorSets[currentFrame], 0, nullptr);

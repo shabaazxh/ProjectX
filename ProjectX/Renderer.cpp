@@ -92,14 +92,11 @@ vk::Renderer::Renderer(Context& context) : context{context}
 	m_Bloom		   = std::make_unique<Bloom>(context, m_DefLighting->GetBrightnessRenderTarget());
 	m_SSR		   = std::make_unique<SSR>(context, m_DefLighting->GetRenderTarget(), m_GBuffer->GetGBufferMRT().DepthTarget, m_GBuffer->GetGBufferMRT().MetRoughnessTarget, m_GBuffer->GetGBufferMRT().NormalTarget, m_camera);
 	m_SSAO		   = std::make_unique<SSAO>(context, m_GBuffer->GetGBufferMRT().DepthTarget, m_GBuffer->GetGBufferMRT().NormalTarget, m_camera);
-	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget(), m_SSAO->GetRenderTarget());
+	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget(), m_SSR->GetRenderTarget());
 	m_PresentPass  = std::make_unique<PresentPass>(context, m_ForwardPass->GetRenderTarget(), m_DefComposite->GetRenderTarget(), m_MeshDensity->GetRenderTarget());
 
 	ImGuiRenderer::Initialize(context);
 	//ImGuiRenderer::AddTexture(clampToEdgeSamplerAniso, m_ShadowMap->GetRenderTarget().imageView, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL);
-
-	backgroundTexture = std::make_unique<Image>(LoadTextureFromDisk("assets/bg.JPG", context));
-	ImGuiRenderer::AddTexture(clampToEdgeSamplerAniso, backgroundTexture->imageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void vk::Renderer::Destroy()
@@ -107,7 +104,6 @@ void vk::Renderer::Destroy()
 	vkDeviceWaitIdle(context.device);
 
 	ImGuiRenderer::Shutdown(context);
-	backgroundTexture.reset();
 	m_SSR.reset();
 	m_SSAO.reset();
 	m_DepthPrepass.reset();

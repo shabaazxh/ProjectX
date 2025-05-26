@@ -75,7 +75,5 @@ namespace vk
 		std::unique_ptr<PresentPass>	  m_PresentPass;
 
 		std::shared_ptr<Camera> m_camera;
-
-		std::unique_ptr<Image> backgroundTexture;
 	};
 }

@@ -16,10 +16,10 @@ void main()
 	vec4 bloom = texture(bloomPass, uv);
 	vec4 ssr = texture(SSR, uv);
 
-	vec4 result = vec4(ssr);
+	vec4 result = vec4(lighting + bloom + ssr);
 
 	vec3 hdrColor = result.rgb;
 	vec3 ldrColor = hdrColor / (hdrColor + vec3(1.0));
 	vec3 gammaCorrectedColor = pow(ldrColor, vec3(1.0 / 2.2));
-	fragColor = vec4((result.rgb), 1.0);
+	fragColor = vec4((gammaCorrectedColor), 1.0);
 }
