@@ -16,15 +16,10 @@ This renderer is for me to experiment with various graphics techniques.
 * Linear depth
 * Mesh density
 
-<table>
-    <tr>
-        <td><img src="showcase/linear_depth.png", alt="Linear Depth", width="300"/></td>
-	<td><img src="showcase/mip_visual.png", alt="Mip Visual", width="300"/></td>
-	<td><img src="showcase/overdraw.png", alt="Overdraw visual", width="300"/></td>
-	<td><img src="showcase/overshading.png", alt="Overshading", width="300"/></td>
-	<td><img src="showcase/pd.png", alt="Partial Derivative visual", width="300"/></td>
-    </tr>
-</table>
+| ![](showcase/linear_depth.png) | ![](showcase/mip_visual.png) | ![](showcase/overdraw.png) | ![](showcase/overshading.png) | ![](showcase/pd.png) |
+|:-----------------------------:|:----------------------------:|:---------------------------:|:-----------------------------:|:---------------------:|
+| Linear Depth                  | Mip Visual                   | Overdraw                    | Overshading                   | Partial Derivative    |
+
 
 
 ## TODO:
