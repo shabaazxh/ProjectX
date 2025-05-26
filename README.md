@@ -23,7 +23,6 @@ This renderer is for me to experiment with various graphics techniques.
 	<td><img src="showcase/overdraw.png", alt="Overdraw visual", width="300"/></td>
 	<td><img src="showcase/overshading.png", alt="Overshading", width="300"/></td>
 	<td><img src="showcase/pd.png", alt="Partial Derivative visual", width="300"/></td>
-	
     </tr>
 </table>
 
