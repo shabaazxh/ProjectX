@@ -7,7 +7,7 @@ Deferred is the default and most developed. Use Key 9,0 to switch between Forwar
 * SSR
 * Bloom (Gaussian Blur)
 
-## Debug visuals (Requirs enabling Forward renderer)
+## Debug visuals (Requires enabling Forward renderer)
 * Mip-map visual
 * Partial Derivative visual 
 * Linear depth
