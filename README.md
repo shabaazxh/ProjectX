@@ -1,4 +1,4 @@
-## Vulkan Renderer
+## ProjectX - Vulkan Renderer
 A simple Vulkan renderer with Forward and Deferred shading.
 Deferred is the default and most developed. Use Keys: 9 and 0 to switch between Forward and Deferred.
 
