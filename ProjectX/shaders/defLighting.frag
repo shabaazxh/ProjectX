@@ -206,7 +206,8 @@ vec3 random_pcg3d(uvec3 v) {
     return vec3(v) * (1.0/float(0xffffffffu));
 }
 
-vec3 computeFog(vec3 sceneColour)
+// Testing here, should be moved out to a seperate render pass
+vec3 VolumetricFog(vec3 sceneColour)
 {
     vec4 WorldPos = vec4(DepthToWorldPos().xyz, 1.0);
     vec3 viewDir =  WorldPos.xyz - ubo.cameraPosition.xyz;
@@ -282,7 +283,7 @@ void main()
 	vec3 ambient = vec3(0.01) * color.rgb * (1.0 - metallic); // NOTE: No ambient for metallic
 	vec3 finalColor = (vec3(outLight + ambient + emissive));
 
-	//vec3 result = computeFog(finalColor.rgb);
+	// vec3 result = computeFog(finalColor.rgb);
 
 	// Determine brightness using luminance: Joey De Vries. Learn OpenGL: Learn Modern OpenGL Graphics Programming in a Step-By-Step Fashion. Kendall & Welling, 2020.
 	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));
