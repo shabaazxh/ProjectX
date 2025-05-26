@@ -11,16 +11,10 @@ This renderer is for me to experiment with various graphics techniques.
 * Bloom (Gaussian Blur)
 
 ## Debug visuals (Requires enabling Forward renderer)
-* Mip-map visual
-* Partial Derivative visual 
-* Linear depth
-* Mesh density
 
-| ![](showcase/linear_depth.png) | ![](showcase/mip_visual.png) | ![](showcase/overdraw.png) | ![](showcase/overshading.png) | ![](showcase/pd.png) |
-|:-----------------------------:|:----------------------------:|:---------------------------:|:-----------------------------:|:---------------------:|
-| Linear Depth                  | Mip Visual                   | Overdraw                    | Overshading                   | Partial Derivative    |
-
-
+| ![](showcase/linear_depth.png) | ![](showcase/mip_visual.png) | ![](showcase/overdraw.png) | ![](showcase/overshading.png) | ![](showcase/pd.png)  | ![](showcase/mesh_density.png) |
+|:-----------------------------:|:----------------------------:|:---------------------------:|:-----------------------------:|:---------------------:| :-----------------------------:|
+| Linear Depth                  | Mip Visual                   | Overdraw                    | Overshading                   | Partial Derivative    | Mesh Density                   |
 
 ## TODO:
 * Indirect lighting solution 
