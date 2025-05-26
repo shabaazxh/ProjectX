@@ -20,4 +20,6 @@ This renderer is for me to experiment with various graphics techniques.
 
 ## TODO:
 * Indirect lighting solution 
+* Cascades Shadow Maps
+* Finish Volumetric Fog
 * Bloom : (Next Generation Post Processing in Call of Duty)
