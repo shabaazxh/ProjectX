@@ -121,6 +121,7 @@
     <ClInclude Include="PresentPass.hpp" />
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="SSAO.hpp" />
     <ClInclude Include="Scene.hpp" />
     <ClInclude Include="ShadowMap.hpp" />
     <ClInclude Include="Skybox.hpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="PresentPass.cpp" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="SSAO.cpp" />
     <ClCompile Include="SSR.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShadowMap.cpp" />

@@ -91,11 +91,23 @@ namespace vk
 		float StepSize;
 	};
 
+	struct SSAOSettings
+	{
+		int NumDirections;
+		int NumSteps;
+		float Radius;
+		float StepSize;
+		float k;
+		float sigma;
+		float time;
+	};
+
 	inline PostProcessing postProcessSettings = {};
 	inline double deltaTime;
 	inline uint32_t setRenderingPipeline = 1;
 	inline uint32_t setAlphaMakingPipeline = 5;
 	inline SSRSettings ssrSettings = { 20, 1, 1.0f, 0.001f, 0.001f };
+	inline SSAOSettings ssaoSettings = {};
 }
 
 namespace vk
@@ -138,6 +150,9 @@ namespace vk
 	}
 }
 
+
+// Notes
+// SSAO and SSR do not have the resize functions implemented which causes a crash on resize
 
 /*
 * Render normal geometry and then render foliage using different pipeline

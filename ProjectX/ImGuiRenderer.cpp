@@ -132,6 +132,27 @@ void vk::ImGuiRenderer::Update(const std::shared_ptr<Scene>& scene, const std::s
         ImGui::SliderFloat("StepSize: ", &ssrSettings.StepSize, 0.0f, 0.5f);
     }
 
+    //struct SSAOSettings
+    //{
+    //    int NumDirections;
+    //    int NumSteps;
+    //    float Radius;
+    //    float StepSize;
+    //    float k;
+    //    float sigma;
+    //    float time;
+    //};
+
+    if (ImGui::CollapsingHeader("SSAO"))
+    {
+        ImGui::SliderInt("Directions: ", &ssaoSettings.NumDirections, 1, 10);
+        ImGui::SliderInt("Steps: ", &ssaoSettings.NumSteps, 0, 20);
+        ImGui::SliderFloat("Radius: ", &ssaoSettings.Radius, 0, 20.0f);
+        ImGui::SliderFloat("StepSize: ", &ssaoSettings.StepSize, 0, 0.1f);
+        ImGui::SliderFloat("K: ", &ssaoSettings.k, 0.0f, 10.0f);
+        ImGui::SliderFloat("Sigma: ", &ssaoSettings.sigma, 0.0f, 10.0f);
+    }
+
 
     static bool enableTextureDebug = false;
     ImGui::Checkbox("Debug Textures", &enableTextureDebug);

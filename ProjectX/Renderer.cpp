@@ -91,12 +91,15 @@ vk::Renderer::Renderer(Context& context) : context{context}
 	m_DefLighting  = std::make_unique<DefLighting>(context, m_camera, m_GBuffer->GetGBufferMRT(), m_ShadowMap->GetRenderTarget(), m_scene);
 	m_Bloom		   = std::make_unique<Bloom>(context, m_DefLighting->GetBrightnessRenderTarget());
 	m_SSR		   = std::make_unique<SSR>(context, m_DefLighting->GetRenderTarget(), m_GBuffer->GetGBufferMRT().DepthTarget, m_GBuffer->GetGBufferMRT().MetRoughnessTarget, m_GBuffer->GetGBufferMRT().NormalTarget, m_camera);
-	//m_Skybox	   = std::make_unique<Skybox>(context, );
-	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget(), m_SSR->GetRenderTarget());
+	m_SSAO		   = std::make_unique<SSAO>(context, m_GBuffer->GetGBufferMRT().DepthTarget, m_GBuffer->GetGBufferMRT().NormalTarget, m_camera);
+	m_DefComposite = std::make_unique<DefCompositePass>(context, m_DefLighting->GetRenderTarget(), m_Bloom->GetRenderTarget(), m_SSAO->GetRenderTarget());
 	m_PresentPass  = std::make_unique<PresentPass>(context, m_ForwardPass->GetRenderTarget(), m_DefComposite->GetRenderTarget(), m_MeshDensity->GetRenderTarget());
 
 	ImGuiRenderer::Initialize(context);
-	ImGuiRenderer::AddTexture(clampToEdgeSamplerAniso, m_ShadowMap->GetRenderTarget().imageView, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL);
+	//ImGuiRenderer::AddTexture(clampToEdgeSamplerAniso, m_ShadowMap->GetRenderTarget().imageView, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL);
+
+	backgroundTexture = std::make_unique<Image>(LoadTextureFromDisk("assets/bg.JPG", context));
+	ImGuiRenderer::AddTexture(clampToEdgeSamplerAniso, backgroundTexture->imageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void vk::Renderer::Destroy()
@@ -104,7 +107,9 @@ void vk::Renderer::Destroy()
 	vkDeviceWaitIdle(context.device);
 
 	ImGuiRenderer::Shutdown(context);
+	backgroundTexture.reset();
 	m_SSR.reset();
+	m_SSAO.reset();
 	m_DepthPrepass.reset();
 	m_MeshDensity.reset();
 	m_ForwardPass.reset();
@@ -165,7 +170,7 @@ void vk::Renderer::CreateFences()
 		};
 
 		VkFence fence = VK_NULL_HANDLE;
-		VK_CHECK(vkCreateFence(context.device, &fenceInfo, nullptr, &fence), "Failedd to create Fence.");
+		VK_CHECK(vkCreateFence(context.device, &fenceInfo, nullptr, &fence), "Failed to create Fence.");
 		m_Fences.push_back(std::move(fence));
 	}
 }
@@ -234,6 +239,8 @@ void vk::Renderer::Render()
 	uint32_t index;
 	VkResult getImageIndex = vkAcquireNextImageKHR(context.device, context.swapchain, UINT64_MAX, m_imageAvailableSemaphores[vk::currentFrame], VK_NULL_HANDLE, &index);
 
+	Update(deltaTime);
+
 	if (getImageIndex == VK_ERROR_OUT_OF_DATE_KHR)
 	{
 		// Recreate swapchain
@@ -246,6 +253,7 @@ void vk::Renderer::Render()
 		m_DefLighting->Resize();
 		m_Bloom->Resize();
 		m_SSR->Resize();
+		m_SSAO->Resize();
 		m_DefComposite->Resize();
 		m_PresentPass->Resize();
 	}
@@ -283,6 +291,7 @@ void vk::Renderer::Render()
 			m_DefLighting->Execute(cmd);
 			m_Bloom->Execute(cmd);
 			m_SSR->Execute(cmd);
+			m_SSAO->Execute(cmd);
 ;			m_DefComposite->Execute(cmd);
 		}
 
@@ -346,6 +355,7 @@ void vk::Renderer::Present(uint32_t imageIndex)
 		m_DefLighting->Resize();
 		m_Bloom->Resize();
 		m_SSR->Resize();
+		m_SSAO->Resize();
 		m_DefComposite->Resize();
 		m_PresentPass->Resize();
 	}
@@ -362,6 +372,7 @@ void vk::Renderer::Update(double deltaTime)
 	m_ForwardPass->Update();
 	m_DefLighting->Update();
 	m_SSR->Update();
+	m_SSAO->Update();
 	m_PresentPass->Update();
 }
 

@@ -97,7 +97,6 @@ float GeometryTerm(vec3 normal, vec3 halfVector, vec3 lightDir, vec3 viewDir)
 	return G;
 }
 
-
 // ======================================================================
 // GGX
 // https://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
@@ -199,6 +198,41 @@ float PCF(vec3 WorldPos)
 	return sum / float(samples);
 }
 
+vec3 random_pcg3d(uvec3 v) {
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;
+    v ^= v >> 16u;
+    v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;
+    return vec3(v) * (1.0/float(0xffffffffu));
+}
+
+vec3 computeFog(vec3 sceneColour)
+{
+    vec4 WorldPos = vec4(DepthToWorldPos().xyz, 1.0);
+    vec3 viewDir =  WorldPos.xyz - ubo.cameraPosition.xyz;
+    float dist = length(viewDir);
+    vec3 RayDir = normalize(viewDir);
+
+    float maxDistance = min(dist, (100.0f));
+    float distTravelled = random_pcg3d(uvec3(gl_FragCoord.x, gl_FragCoord.y, uint(0))).x * 0.1;
+    float transmittance = 1.0;
+
+    float density = 0.1;
+    vec3 finalColour = vec3(0);
+    vec3 LightColour = vec3(0.6, 0.75, 1.0);
+    while(distTravelled < maxDistance)
+    {
+        vec3 currentPos = ubo.cameraPosition.xyz + RayDir * distTravelled;
+        float visbility = 1.0 - Shadow(currentPos);
+        finalColour += LightColour * 1.0 * density * 0.1 * visbility;
+        transmittance *= exp(-density * 0.1);
+        distTravelled += 0.1;
+    }
+
+    transmittance = clamp(transmittance, 0.0, 1.0);
+    return mix(sceneColour.rgb, finalColour, 1.0 - transmittance);
+}
+
 
 void main()
 {
@@ -208,16 +242,15 @@ void main()
     vec3 wNormal = normalize(texture(gNormal, uv).xyz * 2.0 - 1.0);
 
 	vec3 outLight = vec3(0.0f);
+	// == Metal and Roughness ==
+	float roughness = max(texture(gMetRoughness, uv).r, 0.1);
+	float metallic = texture(gMetRoughness, uv).g;
 
 	for(int i = 0; i < NUM_LIGHTS; i++)
 	{
 		vec3 lightDir = normalize(lightData.lights[i].LightPosition.xyz - WorldPos.xyz);
 		vec3 viewDir = normalize(ubo.cameraPosition.xyz - WorldPos.xyz);
 		vec3 halfVector = normalize(viewDir + lightDir);
-
-		// == Metal and Roughness ==
-		float roughness = max(texture(gMetRoughness, uv).r, 0.1);
-		float metallic = texture(gMetRoughness, uv).g;
 
 		// is it a spot light?
 		vec3 LightColour = vec3(0.0);
@@ -239,19 +272,17 @@ void main()
 		// Apply shadow only to direct lighting
 		if(isDirectional) {
 			float shadowCoefficent = 1.0 - PCF(WorldPos);
-			outLight += shadowCoefficent * CookTorranceBRDF(wNormal, halfVector, viewDir, lightDir, metallic, roughness, color.xyz, LightColour);
+			outLight += CookTorranceBRDF(wNormal, halfVector, viewDir, lightDir, metallic, roughness, color.xyz, LightColour) * shadowCoefficent;
 
 		}
 		else {
 			outLight += CookTorranceBRDF(wNormal, halfVector, viewDir, lightDir, metallic, roughness, color.xyz, LightColour);
 		}
 	}
+	vec3 ambient = vec3(0.01) * color.rgb * (1.0 - metallic); // NOTE: No ambient for metallic
+	vec3 finalColor = (vec3(outLight + ambient + emissive));
 
-	vec3 ambient = vec3(0.02) * color.xyz;
-	outLight += ambient;
-
-	// Compute the final color
-	vec3 finalColor = (vec3(outLight + emissive));
+	//vec3 result = computeFog(finalColor.rgb);
 
 	// Determine brightness using luminance: Joey De Vries. Learn OpenGL: Learn Modern OpenGL Graphics Programming in a Step-By-Step Fashion. Kendall & Welling, 2020.
 	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));

@@ -1,27 +1,23 @@
 #include "Context.hpp"
-#include "SSR.h"
+#include "SSAO.hpp"
 #include "Utils.hpp"
 #include "Pipeline.hpp"
 #include "RenderPass.hpp"
 
-vk::SSR::SSR(Context& context,
-    const Image& inputImage,
+vk::SSAO::SSAO(Context& context,
     const Image& depthBuffer,
-    const Image& metallicRoughness,
     const Image& normalsTexture,
     std::shared_ptr<Camera> camera) :
     context{ context },
-    inputImage{ inputImage },
     depthBuffer{ depthBuffer },
-    metallicRoughness{ metallicRoughness },
-    normalsTexture{normalsTexture},
-    camera { camera }
+    normalsTexture{ normalsTexture },
+    camera{ camera }
 {
     m_width = context.extent.width;
     m_height = context.extent.height;
 
     m_RenderTarget = CreateImageTexture2D(
-        "SSR_RenderTarget",
+        "SSAO_RenderTarget",
         context,
         m_width,
         m_height,
@@ -31,10 +27,10 @@ vk::SSR::SSR(Context& context,
         1
     );
 
-    m_SSRUniform.resize(MAX_FRAMES_IN_FLIGHT);
-    for (auto& buffer : m_SSRUniform)
+    m_SSAOUniform.resize(MAX_FRAMES_IN_FLIGHT);
+    for (auto& buffer : m_SSAOUniform)
     {
-        buffer = CreateBuffer("SSRSettingsUBO", context, sizeof(SSRSettings), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT);
+        buffer = CreateBuffer("SSAOSettingsUBO", context, sizeof(SSAOSettings), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT);
     }
 
     BuildDescriptors();
@@ -43,14 +39,15 @@ vk::SSR::SSR(Context& context,
     CreatePipeline();
 }
 
-void vk::SSR::Update()
+void vk::SSAO::Update()
 {
-    m_SSRUniform[currentFrame].WriteToBuffer(ssrSettings, sizeof(SSRSettings));
+    ssaoSettings.time = glfwGetTime();
+    m_SSAOUniform[currentFrame].WriteToBuffer(ssaoSettings, sizeof(SSAOSettings));
 }
 
-vk::SSR::~SSR()
+vk::SSAO::~SSAO()
 {
-    for (auto& buffer : m_SSRUniform)
+    for (auto& buffer : m_SSAOUniform)
     {
         buffer.Destroy(context.device);
     }
@@ -62,24 +59,25 @@ vk::SSR::~SSR()
     vkDestroyRenderPass(context.device, m_RenderPass, nullptr);
 }
 
-void vk::SSR::Resize()
+void vk::SSAO::Resize()
 {
+
     m_width = context.extent.width;
     m_height = context.extent.height;
 
     m_RenderTarget.Destroy(context.device);
 	vkDestroyFramebuffer(context.device, m_Framebuffer, nullptr);
 
-    m_RenderTarget = CreateImageTexture2D(
-        "SSR_RenderTarget",
-        context,
-        m_width,
-        m_height,
-        VK_FORMAT_R16G16B16A16_SFLOAT,
-        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-        VK_IMAGE_ASPECT_COLOR_BIT,
-        1
-    );
+	m_RenderTarget = CreateImageTexture2D(
+		"SSAO_RenderTarget",
+		context,
+		m_width,
+		m_height,
+		VK_FORMAT_R16G16B16A16_SFLOAT,
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		VK_IMAGE_ASPECT_COLOR_BIT,
+		1
+	);
 
     CreateFramebuffer();
 
@@ -98,40 +96,18 @@ void vk::SSR::Resize()
     {
         VkDescriptorImageInfo imageInfo = {
             .sampler = clampToEdgeSamplerAniso,
-            .imageView = inputImage.imageView,
+            .imageView = normalsTexture.imageView,
             .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
         };
 
         UpdateDescriptorSet(context, 3, imageInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
     }
-
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-    {
-        VkDescriptorImageInfo imageInfo = {
-            .sampler = clampToEdgeSamplerAniso,
-            .imageView = metallicRoughness.imageView,
-            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
-
-        UpdateDescriptorSet(context, 4, imageInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    }
-
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-    {
-        VkDescriptorImageInfo imageInfo = {
-            .sampler = clampToEdgeSamplerAniso,
-            .imageView = normalsTexture.imageView,
-            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
-
-        UpdateDescriptorSet(context, 5, imageInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    }
 }
 
-void vk::SSR::Execute(VkCommandBuffer cmd)
+void vk::SSAO::Execute(VkCommandBuffer cmd)
 {
 #ifdef _DEBUG
-    RenderPassLabel(cmd, "SSR");
+    RenderPassLabel(cmd, "SSAO");
 #endif // !DEBUG
 
     VkRenderPassBeginInfo renderPassInfo{};
@@ -162,11 +138,11 @@ void vk::SSR::Execute(VkCommandBuffer cmd)
 #endif // !DEBUG
 }
 
-void vk::SSR::CreatePipeline()
+void vk::SSAO::CreatePipeline()
 {
     auto pipelineResult = vk::PipelineBuilder(context.device, PipelineType::GRAPHICS, VertexBinding::NONE, 0)
         .AddShader("../Engine/assets/shaders/fs_tri.vert.spv", ShaderType::VERTEX)
-        .AddShader("../Engine/assets/shaders/SSR.frag.spv", ShaderType::FRAGMENT)
+        .AddShader("../Engine/assets/shaders/SSAO.frag.spv", ShaderType::FRAGMENT)
         .SetInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
         .SetDynamicState({ {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR} })
         .SetRasterizationState(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE)
@@ -180,7 +156,7 @@ void vk::SSR::CreatePipeline()
     m_Pipeline = pipelineResult.first;
     m_PipelineLayout = pipelineResult.second;
 }
-void vk::SSR::CreateRenderPass()
+void vk::SSAO::CreateRenderPass()
 {
     RenderPass builder(context.device, 1);
 
@@ -195,10 +171,10 @@ void vk::SSR::CreateRenderPass()
         .AddDependency(0, VK_SUBPASS_EXTERNAL, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_SHADER_READ_BIT, VK_DEPENDENCY_BY_REGION_BIT)
         .Build();
 
-    context.SetObjectName(context.device, (uint64_t)m_RenderPass, VK_OBJECT_TYPE_RENDER_PASS, "SSRRenderPass");
+    context.SetObjectName(context.device, (uint64_t)m_RenderPass, VK_OBJECT_TYPE_RENDER_PASS, "SSAORenderPass");
 }
 
-void vk::SSR::CreateFramebuffer()
+void vk::SSAO::CreateFramebuffer()
 {
     std::vector<VkImageView> attachments = { m_RenderTarget.imageView };
 
@@ -212,10 +188,10 @@ void vk::SSR::CreateFramebuffer()
         .layers = 1
     };
 
-    VK_CHECK(vkCreateFramebuffer(context.device, &fbcInfo, nullptr, &m_Framebuffer), "Failed to create SSR framebuffer.");
+    VK_CHECK(vkCreateFramebuffer(context.device, &fbcInfo, nullptr, &m_Framebuffer), "Failed to create SSAO framebuffer.");
 }
 
-void vk::SSR::BuildDescriptors()
+void vk::SSAO::BuildDescriptors()
 {
     m_DescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
     {
@@ -223,9 +199,7 @@ void vk::SSR::BuildDescriptors()
             CreateDescriptorBinding(0, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT),
             CreateDescriptorBinding(1, 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT),
             CreateDescriptorBinding(2, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT),
-            CreateDescriptorBinding(3, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT),
-            CreateDescriptorBinding(4, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT),
-            CreateDescriptorBinding(5, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+            CreateDescriptorBinding(3, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
         };
 
         m_DescriptorSetLayout = CreateDescriptorSetLayout(context, bindings);
@@ -245,9 +219,9 @@ void vk::SSR::BuildDescriptors()
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = m_SSRUniform[i].buffer;
+        bufferInfo.buffer = m_SSAOUniform[i].buffer;
         bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(SSRSettings);
+        bufferInfo.range = sizeof(SSAOSettings);
         UpdateDescriptorSet(context, 1, bufferInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     }
 
@@ -266,33 +240,11 @@ void vk::SSR::BuildDescriptors()
     {
         VkDescriptorImageInfo imageInfo = {
             .sampler = clampToEdgeSamplerAniso,
-            .imageView = inputImage.imageView,
-            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
-
-        UpdateDescriptorSet(context, 3, imageInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    }
-
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-    {
-        VkDescriptorImageInfo imageInfo = {
-            .sampler = clampToEdgeSamplerAniso,
-            .imageView = metallicRoughness.imageView,
-            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
-
-        UpdateDescriptorSet(context, 4, imageInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    }
-
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-    {
-        VkDescriptorImageInfo imageInfo = {
-            .sampler = clampToEdgeSamplerAniso,
             .imageView = normalsTexture.imageView,
             .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
         };
 
-        UpdateDescriptorSet(context, 5, imageInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+        UpdateDescriptorSet(context, 3, imageInfo, m_DescriptorSets[i], VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
     }
 }
 

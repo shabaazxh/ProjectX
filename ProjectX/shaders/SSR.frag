@@ -96,7 +96,7 @@ vec4 NaiveScreenSpaceReflections()
 	vec3 WorldNormal = normalize((texture(normalsTexture, uv).xyz * 2.0 - 1.0));
 
 	vec3 camDir = normalize(WorldPos.xyz - ubo.cameraPosition.xyz);
-	vec3 reflectionDirection = sampleGGXVNDF(WorldNormal, ssr.thickness, getRandomXi(gl_FragCoord.xy));
+	vec3 reflectionDirection = reflect(camDir, WorldNormal); //sampleGGXVNDF(WorldNormal, ssr.thickness, getRandomXi(gl_FragCoord.xy));
 
 	vec3 worldReflectionDir = (reflectionDirection);
 
@@ -145,7 +145,7 @@ vec4 NaiveScreenSpaceReflections()
 			projectedCoords.xyz /= projectedCoords.w;
 			projectedCoords.xy = projectedCoords.xy * 0.5 + 0.5;
 
-			float NdotR = max(dot(-camDir, worldReflectionDir), 0.0);
+			//float NdotR = max(dot(-camDir, worldReflectionDir), 0.0);
 			color = texture(renderedScene, projectedCoords.xy);
 
 			vec2 center = vec2(0.5, 0.5);
@@ -160,11 +160,17 @@ vec4 NaiveScreenSpaceReflections()
 			vec2 hitPixelNDC = projectedCoords.xy * 2.0 - 1.0;
 			const float blendScreenEdgeFade = 5.0f;
 
+
+			// Rays which point towards the camera have less contribution (likely hitting the back of a surface)
+			float NdotR = max(dot(normalize(-camDir), normalize(worldReflectionDir)), 0.0);
+			float TowardsCameraVisbility = clamp(1.0 - NdotR, 0.0, 1.0);
+
 			// Compute edge vignette (similar to CalculateEdgeVignette)
 			vec2 vignette = clamp(abs(hitPixelNDC) * blendScreenEdgeFade - (blendScreenEdgeFade - 1.0), 0.0, 1.0);
 			float fadeFactor = clamp(1.0 - dot(vignette, vignette), 0.0, 1.0);
+            float screenFade = clamp(1.0 - dot(vignette, vignette), 0.0, 1.0);
 
-			return color;
+			return color * TowardsCameraVisbility * screenFade;
 
 			//return mix(color.rgb, vec3(0,0,0),	 NdotR); // if its closer to 1, we get less reflection since its aligned with camera
 		}
@@ -313,16 +319,24 @@ float ScreenSpaceShadows()
 	return 1.0;
 }
 
+vec3 random_pcg3d(uvec3 v) {
+  v = v * 1664525u + 1013904223u;
+  v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;
+  v ^= v >> 16u;
+  v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;
+  return vec3(v) * (1.0/float(0xffffffffu));
+}
+
 // "screen-space" refers to "pixel-space" i.e. the screen-space position of a pixel not in the range 0-1
-vec3 ScreenSpaceReflections()
+vec3 ScreenSpaceReflections(inout bool didHit)
 {
     const vec2 texSize = textureSize(depthBuffer, 0); // Should use ubo.viewportSize
-    const float MAX_DISTANCE = ssr.MaxDistance;
+    float MAX_DISTANCE = ssr.MaxDistance;
 
     // World-space setup
     vec3 WorldPos = DepthToPosition(uv).xyz;
     vec3 camDir = normalize(WorldPos - ubo.cameraPosition.xyz);
-    vec3 WorldNormal = normalize((texture(normalsTexture, uv).xyz * 2.0 - 1.0));;
+    vec3 WorldNormal = normalize((texture(normalsTexture, uv).xyz * 2.0 - 1.0));
     vec3 worldReflectionDir = normalize(reflect(camDir, WorldNormal));
 
     vec3 WorldSpaceBegin = WorldPos;
@@ -342,6 +356,7 @@ vec3 ScreenSpaceReflections()
     // Start and End setup, determine step direction
     float dx = end.x - start.x;
     float dy = end.y - start.y;
+    // int stepDir = max(16, min(ssr.MaxSteps, max(abs(int(dx)), abs(int(dy)))));
     int stepDir = max(abs(int(dx)), abs(int(dy)));
 
 	// Early exit if start and end are the same. We don't need to traverse the ray
@@ -374,14 +389,14 @@ vec3 ScreenSpaceReflections()
 
         // Depth test to determine hit
         float depthDiff = z - depth;
-        if (depthDiff > 0.0 && depthDiff < ssr.thickness) { // Tighter range
+        if (depthDiff > 0.0 && depthDiff <= ssr.thickness) { // Tighter range
 
 			// Sample the colour at the hit point
 			vec3 colour = texelFetch(renderedScene, ivec2(x, y), 0).rgb;
 
 			// Screen-fading at edges
 			vec2 hitPixelNDC = (vec2(x,y) / texSize) * 2.0 - 1.0; // get in NDC [-1, 1]
-			const float blendScreenEdgeFade = 5.0f;
+			const float blendScreenEdgeFade = 2.0f;
 			vec2 vignette = clamp(abs(hitPixelNDC) * blendScreenEdgeFade - (blendScreenEdgeFade - 1.0), 0.0, 1.0);
 			float screenFade = clamp(1.0 - dot(vignette, vignette), 0.0, 1.0);
 
@@ -391,11 +406,13 @@ vec3 ScreenSpaceReflections()
 
 			// Fade the ray based on the distance the ray has travelled
 			float DistanceTravelled = 1.0 - clamp(float(i) / float(stepDir), 0.0, 1.0);
-			return colour * TowardsCameraVisbility * DistanceTravelled * screenFade;
+			//return vec3(DistanceTravelled, 0, 0);
+            didHit = true;
+            return colour * DistanceTravelled * TowardsCameraVisbility * screenFade;
+
         }
     }
-
-    return vec3(0.0);
+    return vec3(0,0,0);
 }
 
 
@@ -607,12 +624,16 @@ vec4 NaiveScreenSpaceReflections3()
     return vec4(0.0, 0.0, 0.0, 1.0);
 }
 
+
 void main() {
 
 	vec3 WorldNormal = normalize((texture(normalsTexture, uv).xyz * 2.0 - 1.0));
 
 	//fragColor = vec4(WorldNormal, 1.0);
-	fragColor = vec4(vec3(ScreenSpaceShadows()), 1.0);
+
+    bool didHit = false;
+    float alpha = didHit ? 1.0 : 0.0;
+	fragColor = vec4(vec3(ScreenSpaceReflections(didHit)), alpha);
 //	bool hasSSR = texture(metallicRoughness, uv).r < 0.9;
 //	if(hasSSR)
 //		fragColor = vec4(NaiveScreenSpaceReflections());

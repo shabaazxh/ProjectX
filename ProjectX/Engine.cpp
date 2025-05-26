@@ -63,7 +63,7 @@ void vk::Engine::Run()
 
 void vk::Engine::Update(double deltaTime)
 {
-	m_Renderer->Update(deltaTime);
+	//m_Renderer->Update(deltaTime);
 }
 
 void vk::Engine::Render()

@@ -42,12 +42,12 @@ vk::ForwardPass::ForwardPass(Context& context, Image& shadowMap, Image& depthPre
 	CreateFramebuffer();
 	CreatePipeline();
 
-	m_Skybox = std::make_unique<Skybox>(context, m_DepthTarget, camera, m_renderPass);
+	//m_Skybox = std::make_unique<Skybox>(context, m_DepthTarget, camera, m_renderPass);
 }
 
 vk::ForwardPass::~ForwardPass()
 {
-	m_Skybox.reset();
+	//m_Skybox.reset();
 	m_RenderTarget.Destroy(context.device);
 	m_DepthTarget.Destroy(context.device);
 

@@ -16,6 +16,7 @@
 #include "ShadowMap.hpp"
 #include "Bloom.hpp"
 #include "SSR.h"
+#include "SSAO.hpp"
 #include "Skybox.hpp"
 #include "ImGuiRenderer.hpp"
 
@@ -68,10 +69,13 @@ namespace vk
 		std::unique_ptr<DefLighting>	  m_DefLighting;
 		std::unique_ptr<Bloom>			  m_Bloom;
 		std::unique_ptr<SSR>              m_SSR;
+		std::unique_ptr<SSAO>			  m_SSAO;
 		std::unique_ptr<Skybox>           m_Skybox;
 		std::unique_ptr<DefCompositePass> m_DefComposite;
 		std::unique_ptr<PresentPass>	  m_PresentPass;
 
 		std::shared_ptr<Camera> m_camera;
+
+		std::unique_ptr<Image> backgroundTexture;
 	};
 }
